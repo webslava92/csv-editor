@@ -1,25 +1,25 @@
 /* eslint-disable no-console */
+import React from 'react';
 import { useCSVReader } from 'react-papaparse';
-
+import dayjs from 'dayjs';
 import {
   Box,
   Button,
   Paper,
 } from '@mui/material';
-import React from 'react';
 import { UploadFileProps } from './types';
 import { JsonToCSV } from './jsonToCsv';
 
 const csvConfig = {
   quotes: false,
-  quoteChar: '"',
-  escapeChar: '"',
+  // quoteChar: '"',
+  // escapeChar: '"',
   delimiter: ',',
   header: true,
-  dynamicTyping: true,
-  newline: '\r\n',
+  // dynamicTyping: true,
+  // newline: '\r\n',
   skipEmptyLines: true,
-  columns: null,
+  // columns: null,
 };
 
 export function UploadFile({ items, setItems }: UploadFileProps) {
@@ -65,7 +65,15 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
           <CSVReader
             config={csvConfig}
             onUploadAccepted={(results: any) => {
-              setItems(results.data);
+              const dateParser = results.data.map((item: any) => Object.keys(item).map((key, _index) => {
+                if (dayjs(item[key]).isValid()) {
+                  return dayjs(item[key]).format('DD.MM.YYYY hh:mm:ss');
+                }
+                return item[key];
+              }
+              ));
+              console.log('dateParser', dateParser);
+              setItems(dateParser);
             }}
           >
             {({

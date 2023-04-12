@@ -1,7 +1,13 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { TextField } from '@mui/material';
-// import { DataType } from './types';
+import { TextField, styled } from '@mui/material';
+
+
+const TableCell = styled(TextField)(() => ({
+  '& fieldset': {
+    borderRadius: 0,
+  },
+}));
 
 export const defaultColumn: Partial<ColumnDef<any>> = {
   cell: ({ getValue, row: { index }, column: { id }, table }) => {
@@ -17,11 +23,20 @@ export const defaultColumn: Partial<ColumnDef<any>> = {
     }, [initialValue]);
 
     return (
-      <TextField
+      <TableCell
         value={value as string}
         onChange={(e) => setValue(e.target.value)}
         onBlur={onBlur}
         size='small'
+        inputProps={{
+          sx: {
+            padding: '3px 8px',
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: 'none',
+          },
+        }}
+        sx={{ bprderRadius: 'none' }}
       />
     );
   },

@@ -7,12 +7,13 @@
   "homepage": "./",
   "main": "dist/electron.js",
   "build": {
-    "appId": "com.example.electron-cra",
+    "appId": "com.example.csv-editor",
     "files": [
       "build/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "dist/electron.js"
     ],
-    "directories":{
+    "directories": {
       "buildResources": "assets"
     }
   },

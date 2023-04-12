@@ -8,6 +8,8 @@ import {
   flexRender,
   RowData,
   ColumnDef,
+  getSortedRowModel,
+  SortingState,
 } from '@tanstack/react-table';
 import {
   Box,
@@ -51,10 +53,14 @@ function useSkipper() {
 
 export function DataTable({ data, setData }: any) {
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const headers = Array.from(
     new Set(data.map((obj: any) => Object.keys(obj))[0])
   );
+
+  console.log('headers', headers);
+
 
   const columnData: any[] = [];
   headers.map((col: any, i: any) =>
@@ -69,6 +75,11 @@ export function DataTable({ data, setData }: any) {
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
     defaultColumn,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -103,7 +114,7 @@ export function DataTable({ data, setData }: any) {
       border: 'none',
     },
     tableCell: {
-      padding: '2px',
+      padding: 0,
       border: 'none',
     },
   };
@@ -111,41 +122,43 @@ export function DataTable({ data, setData }: any) {
   return (
     <Paper sx={styles.wrapper}>
       <Typography variant='h5'>Filters</Typography>
-      <Table>
-        <TableHead sx={styles.head}>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableCell
-                  key={header.id}
-                  colSpan={header.colSpan}
-                  sx={styles.headCell}
-                >
-                  {header.column.getCanFilter() ? (
-                    <Box>
-                      <Filter column={header.column} />
-                    </Box>
-                  ) : null}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableHead>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} sx={styles.tableCell}>
-                  {flexRender(
-                    cell.column.columnDef.cell,
-                    cell.getContext()
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <Box>
+        <Table>
+          <TableHead sx={styles.head}>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableCell
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    sx={styles.headCell}
+                  >
+                    {header.column.getCanFilter() ? (
+                      <Box>
+                        <Filter column={header.column} />
+                      </Box>
+                    ) : null}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
+          <TableBody sx={{ border: '1px solid #ccc' }}>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} sx={styles.tableCell}>
+                    {flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext()
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
       <TableFooter
         setPageIndex={table.setPageIndex}
         getCanPreviousPage={table.getCanPreviousPage}
