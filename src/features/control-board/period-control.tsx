@@ -47,7 +47,7 @@ export function PeriodControl({
       Object.assign(
         {},
         ...Object.entries(item).map(([key, val]: any) => ({
-          [key]: dayjs(val).isValid()
+          [key]: (dayjs(val).isValid() && key !== 'phone')
             ? dayjs(fromValue + periodTime).toISOString()
             : val,
         }))
