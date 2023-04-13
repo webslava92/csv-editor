@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { TextField, styled } from '@mui/material';
+import dayjs from 'dayjs';
 
 
 const TableCell = styled(TextField)(() => ({
@@ -10,7 +12,7 @@ const TableCell = styled(TextField)(() => ({
 }));
 
 export const defaultColumn: Partial<ColumnDef<any>> = {
-  cell: ({ getValue, row: { index }, column: { id }, table }) => {
+  cell: ({ getValue, row: { index }, column: { id }, table, cell }) => {
     const initialValue = getValue();
     const [value, setValue] = React.useState(initialValue);
 
@@ -24,7 +26,11 @@ export const defaultColumn: Partial<ColumnDef<any>> = {
 
     return (
       <TableCell
-        value={value as string}
+        value={
+          (dayjs(value as string).isValid() && cell.column.id !== 'phone')
+            ? dayjs(value as string).format('DD.MM.YYYY hh:mm:ss')
+            : value
+        }
         onChange={(e) => setValue(e.target.value)}
         onBlur={onBlur}
         size='small'

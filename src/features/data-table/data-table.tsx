@@ -59,9 +59,6 @@ export function DataTable({ data, setData }: any) {
     new Set(data.map((obj: any) => Object.keys(obj))[0])
   );
 
-  console.log('headers', headers);
-
-
   const columnData: any[] = [];
   headers.map((col: any, i: any) =>
     columnData.push({

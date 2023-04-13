@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, TextField } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 export function TableFooter({
   setPageIndex,
@@ -16,14 +16,11 @@ export function TableFooter({
     footerControlsBox: {
       display: 'flex',
       alignItems: 'center',
-      padding: 2,
       marginTop: 2,
-      backgroundColor: '#f3f3f3',
     },
     pageBox: {
       display: 'flex',
       alignItems: 'center',
-      margin: 2,
     },
     pageBoxText: {
       marginRight: 1,
@@ -31,13 +28,14 @@ export function TableFooter({
     goToPage: {
       display: 'flex',
       alignItems: 'center',
-      margin: 2,
     },
     goToPageText: {
       marginRight: 1,
+      marginLeft: 1
     },
     perPageBox: {
-      margin: 2,
+      marginLeft: 1,
+      marginRight: 1
     },
     numberOfRows: {
       marginLeft: 1,
@@ -45,7 +43,7 @@ export function TableFooter({
   };
 
   return (
-    <Paper sx={styles.footerControlsBox}>
+    <Box sx={styles.footerControlsBox}>
       <Box>
         <Button
           onClick={() => setPageIndex(0)}
@@ -116,6 +114,6 @@ export function TableFooter({
           {getRowModel().rows.length}
         </Box>
       </Box>
-    </Paper>
+    </Box>
   );
 }
