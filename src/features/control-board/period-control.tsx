@@ -30,13 +30,11 @@ export function PeriodControl({
     wrapper: { display: 'flex', justifyContent: 'space-between' },
   };
 
-  // function isCorrectDate(curent: string) {
-  //   const formated = dayjs(dayjs(curent).format('DD-MM-YYYY hh:mm:ss'));
-  //   const isCorrect = formated >= fromValue && formated <= toValue;
-  //   console.log('isCorrect', isCorrect);
-
-  //   return !isCorrect;
-  // }
+  function randomDate(start: any, end: any) {
+    return new Date(
+      start + Math.random() * (end - start)
+    );
+  }
 
   const handleChangeDates = () => {
     const from = dayjs(fromValue);
@@ -47,9 +45,10 @@ export function PeriodControl({
       Object.assign(
         {},
         ...Object.entries(item).map(([key, val]: any) => ({
-          [key]: (dayjs(val).isValid() && key !== 'phone')
-            ? dayjs(fromValue + periodTime).toISOString()
-            : val,
+          [key]:
+            dayjs(val).isValid() && key !== 'phone'
+              ? randomDate(fromValue, toValue)
+              : val,
         }))
       )
     );

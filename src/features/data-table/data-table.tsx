@@ -131,7 +131,7 @@ export function DataTable({ data, setData }: any) {
                     sx={styles.headCell}
                   >
                     {header.column.getCanFilter() ? (
-                      <Box>
+                      <Box sx={{ display: 'flex' }}>
                         <Filter column={header.column} />
                       </Box>
                     ) : null}

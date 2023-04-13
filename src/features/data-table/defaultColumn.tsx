@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { TextField, styled } from '@mui/material';
 import dayjs from 'dayjs';
@@ -14,13 +14,13 @@ const TableCell = styled(TextField)(() => ({
 export const defaultColumn: Partial<ColumnDef<any>> = {
   cell: ({ getValue, row: { index }, column: { id }, table, cell }) => {
     const initialValue = getValue();
-    const [value, setValue] = React.useState(initialValue);
+    const [value, setValue] = useState(initialValue);
 
     const onBlur = () => {
       table.options.meta?.updateData(index, id, value);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
       setValue(initialValue);
     }, [initialValue]);
 
