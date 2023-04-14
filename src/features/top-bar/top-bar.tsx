@@ -83,7 +83,7 @@ export function TopBar() {
       <Box sx={styles.titleBar}>
         <Box sx={styles.menuBox}>
           <Box component='p' sx={styles.title}>
-            Lead exchange
+            CSV EDITOR
           </Box>
         </Box>
         <Box sx={styles.titleBarActions}>

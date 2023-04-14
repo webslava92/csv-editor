@@ -68,7 +68,7 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={styles.pickerBox}>
               <DateTimePicker
-                label='From'
+                label='Choose the initial period'
                 format='DD.MM.YYYY hh:mm:ss'
                 value={fromValue}
                 onChange={handleChangeFromValue}
@@ -93,7 +93,7 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={styles.pickerBox}>
               <DateTimePicker
-                label='To'
+                label='Choose the end period'
                 format='DD.MM.YYYY hh:mm:ss'
                 value={toValue}
                 onChange={handleChangeToValue}

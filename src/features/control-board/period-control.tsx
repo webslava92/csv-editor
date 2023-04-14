@@ -26,21 +26,16 @@ export function PeriodControl({
   data,
   setData,
 }: Props) {
-  const styles = {
-    wrapper: { display: 'flex', justifyContent: 'space-between' },
+  const handleResetDates = () => {
+    setFromValue(dayjs());
+    setToValue(dayjs());
   };
 
   function randomDate(start: any, end: any) {
-    return new Date(
-      start + Math.random() * (end - start)
-    );
+    return new Date(start + Math.random() * (end - start));
   }
 
   const handleChangeDates = () => {
-    const from = dayjs(fromValue);
-    const to = dayjs(toValue);
-    const periodTime = to.diff(from, 'second') / data.length;
-
     const newDate = data.map((item: any) =>
       Object.assign(
         {},
@@ -52,24 +47,36 @@ export function PeriodControl({
         }))
       )
     );
-    console.log('newDate', newDate);
-
-    console.log('periodTime', periodTime);
     setData(newDate);
+  };
+
+  const isDisabled = dayjs(fromValue).isSame(toValue);
+
+  const styles = {
+    wrapper: { display: 'flex', justifyContent: 'space-between' },
+    pickersBox: { display: 'flex', gap: 1 },
+    btnBox: { display: 'flex', gap: 1 },
   };
 
   return (
     <Box sx={styles.wrapper}>
-      <PeriodPicker
-        fromValue={fromValue}
-        setFromValue={setFromValue}
-        toValue={toValue}
-        setToValue={setToValue}
-        error={error}
-      />
-      <Button variant='contained' onClick={handleChangeDates}>
-        Change Dates
-      </Button>
+      <Box sx={styles.pickersBox}>
+        <PeriodPicker
+          fromValue={fromValue}
+          setFromValue={setFromValue}
+          toValue={toValue}
+          setToValue={setToValue}
+          error={error}
+        />
+        <Button variant='contained' disabled={isDisabled} onClick={handleResetDates}>
+          Reset Dates
+        </Button>
+      </Box>
+      <Box sx={styles.btnBox}>
+        <Button variant='contained' disabled={isDisabled} onClick={handleChangeDates}>
+          Change Dates
+        </Button>
+      </Box>
     </Box>
   );
 }

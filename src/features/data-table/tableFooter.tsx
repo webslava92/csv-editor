@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
@@ -11,6 +12,9 @@ export function TableFooter({
   setPageSize,
   getPageCount,
   getRowModel,
+  rowSelection,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  table,
 }: any) {
   const styles = {
     footerControlsBox: {
@@ -31,16 +35,32 @@ export function TableFooter({
     },
     goToPageText: {
       marginRight: 1,
-      marginLeft: 1
+      marginLeft: 1,
     },
     perPageBox: {
       marginLeft: 1,
-      marginRight: 1
+      marginRight: 1,
     },
     numberOfRows: {
       marginLeft: 1,
     },
   };
+
+  const handleRemoveData = () => {
+    const checkedRows = Object.keys(rowSelection).map((item) => parseInt(item, 10));
+    console.log('value', checkedRows);
+  };
+
+  // const handleRemoveRow = () => {
+  //   const checkedRows = Object.keys(rowSelection).map((item) =>
+  //     parseInt(item, 10)
+  //   );
+  //   const findRow = table.options.data.find(
+  //     (item, index) => index === checkedRows[0]
+  //   );
+  //   const newData = data.filter((item: any) => item.id !== findRow.id);
+  //   console.log('newData', newData);
+  // };
 
   return (
     <Box sx={styles.footerControlsBox}>
@@ -114,6 +134,16 @@ export function TableFooter({
           {getRowModel().rows.length}
         </Box>
       </Box>
+      <Button
+        {...{
+          checked: table.getIsAllRowsSelected(),
+          indeterminate: table.getIsSomeRowsSelected(),
+          onChange: table.getToggleAllRowsSelectedHandler(),
+        }}
+        onClick={handleRemoveData}
+      >
+        Remove
+      </Button>
     </Box>
   );
 }

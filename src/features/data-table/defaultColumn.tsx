@@ -42,7 +42,7 @@ export const defaultColumn: Partial<ColumnDef<any>> = {
             borderRadius: 'none',
           },
         }}
-        sx={{ bprderRadius: 'none' }}
+        sx={{ bprderRadius: 'none', width: '100%' }}
       />
     );
   },

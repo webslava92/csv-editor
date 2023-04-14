@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import { PeriodControl } from './period-control';
+import { DuplicateControl } from './dublicate-control';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -42,7 +43,7 @@ export function ControlBoard({ data, setData }: any) {
   const [fromValue, setFromValue] = useState<Dayjs | null>(dayjs());
   const [toValue, setToValue] = useState<Dayjs | null>(dayjs());
   const [error, setError] = useState<string>('');
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
 
   const handleChangeTab = (
     event: React.SyntheticEvent,
@@ -80,8 +81,8 @@ export function ControlBoard({ data, setData }: any) {
             aria-label='Control Tabs'
           >
             <Tab label='Period' {...a11yProps(0)} />
-            <Tab label='Item Two' {...a11yProps(1)} />
-            <Tab label='Item Three' {...a11yProps(2)} />
+            <Tab label='Duplicates' {...a11yProps(1)} />
+            <Tab label='Add row' {...a11yProps(1)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -96,10 +97,10 @@ export function ControlBoard({ data, setData }: any) {
           />
         </TabPanel>
         <TabPanel value={value} index={1}>
-          Item Two
+          <DuplicateControl data={data} setData={setData} />
         </TabPanel>
-        <TabPanel value={value} index={2}>
-          Item Three
+        <TabPanel value={value} index={1}>
+          Add Row
         </TabPanel>
       </Box>
     </Paper>

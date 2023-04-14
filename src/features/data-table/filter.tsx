@@ -13,6 +13,7 @@ export function Filter({ column }: { column: Column<any, any> }) {
       onChange={(e) => column.setFilterValue(e.target.value)}
       placeholder={'Search...'}
       size='small'
+      sx={{ width: '100%' }}
     />
   );
 }

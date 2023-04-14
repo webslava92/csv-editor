@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { HTMLProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,6 +14,9 @@ import {
 } from '@tanstack/react-table';
 import {
   Box,
+  Button,
+  Checkbox,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -21,6 +25,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
+import { Delete, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { Filter } from './filter';
 import { defaultColumn } from './defaultColumn';
 import { TableFooter } from './tableFooter';
@@ -54,6 +59,8 @@ function useSkipper() {
 export function DataTable({ data, setData }: any) {
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const headers = Array.from(
     new Set(data.map((obj: any) => Object.keys(obj))[0])
@@ -67,16 +74,73 @@ export function DataTable({ data, setData }: any) {
     })
   );
 
-  const columns = useMemo<ColumnDef<any>[]>(() => columnData, [data]);
+  const checkboxes = {
+    id: 'select',
+    header: useCallback(
+      ({ table }: any) => (
+        <Checkbox
+          checked={table.getIsAllRowsSelected()}
+          indeterminate={table.getIsSomeRowsSelected()}
+          onChange={table.getToggleAllRowsSelectedHandler()}
+        />
+      ),
+      []
+    ),
+    cell: useCallback(
+      ({ row }: any) => (
+        <Box component='div'>
+          <Checkbox
+            checked={row.getIsSelected()}
+            indeterminate={row.getIsSomeSelected()}
+            onChange={row.getToggleSelectedHandler()}
+          />
+        </Box>
+      ),
+      []
+    ),
+  };
+
+  const removeRow = (row: any) => {
+    const newData = data.filter((item: any) => item.id !== row.original.id);
+    setData(newData);
+    console.log('row', row);
+    console.log('newData', newData);
+  };
+
+  const actions = {
+    id: 'actions',
+    header: useCallback(
+      ({ table }: any) => (
+        <Box>Actions</Box>
+      ),
+      []
+    ),
+    cell: useCallback(
+      ({ row }: any) => (
+        <IconButton onClick={() => removeRow(row)}>
+          <Delete />
+        </IconButton>
+      ),
+      []
+    ),
+  };
+
+  const columns = useMemo<ColumnDef<any>[]>(
+    () => [checkboxes, ...columnData, actions],
+    []
+  );
 
   const table = useReactTable({
     data,
     columns,
     state: {
       sorting,
+      rowSelection,
     },
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     defaultColumn,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -106,8 +170,19 @@ export function DataTable({ data, setData }: any) {
       padding: 2,
     },
     head: {},
+    headerCellBox: {
+      display: 'flex',
+      alignItems: 'center',
+      marginTop: 3
+    },
+    headerTitle: {
+      fontSize: '1rem',
+      fontWeight: 700,
+      padding: 1,
+      marginRight: 1
+    },
     headCell: {
-      padding: '2px 2px 24px 2px',
+      padding: '2px',
       border: 'none',
     },
     tableCell: {
@@ -116,8 +191,25 @@ export function DataTable({ data, setData }: any) {
     },
   };
 
+  // const handleRemoveRow = () => {
+  //   const checkedRows = Object.keys(rowSelection).map((item) =>
+  //     parseInt(item, 10)
+  //   );
+  //   const findRow = table.options.data.find(
+  //     (item, index) => index === checkedRows[0]
+  //   );
+  //   const newData = data.filter((item: any) => item.id !== findRow.id);
+  //   setData(newData);
+  //   console.log('newData', newData);
+  // };
+
   return (
     <Paper sx={styles.wrapper}>
+      {/* <Button
+        onClick={handleRemoveRow}
+      >
+        Remove
+      </Button> */}
       <Typography variant='h5'>Filters</Typography>
       <Box>
         <Table>
@@ -135,6 +227,38 @@ export function DataTable({ data, setData }: any) {
                         <Filter column={header.column} />
                       </Box>
                     ) : null}
+                    {header.isPlaceholder ? null : (
+                      <Box
+                        component='div'
+                        {...{
+                          className: header.column.getCanSort()
+                            ? 'cursor-pointer select-none'
+                            : '',
+                          onClick: header.column.getToggleSortingHandler(),
+                        }}
+                      >
+                        <Box sx={styles.headerCellBox}>
+                          {header.column.getCanSort() ? (
+                            <Typography
+                              variant='body1'
+                              sx={styles.headerTitle}
+                            >
+                              {header.column.id.charAt(0).toUpperCase() +
+                                header.column.id
+                                  .slice(1)
+                                  .split('_')
+                                  .join(' ')}
+                            </Typography>
+                          ) : null}
+                          {
+                            {
+                              asc: <KeyboardArrowUp />,
+                              desc: <KeyboardArrowDown />,
+                            }[header.column.getIsSorted() as string]
+                          }
+                        </Box>
+                      </Box>
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
@@ -166,6 +290,8 @@ export function DataTable({ data, setData }: any) {
         getRowModel={table.getRowModel}
         getState={table.getState}
         setPageSize={table.setPageSize}
+        rowSelection={rowSelection}
+        table={table}
       />
     </Paper>
   );

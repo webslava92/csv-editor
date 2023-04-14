@@ -29,10 +29,11 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
   const styles = {
     wrapper: {
       marginTop: 2,
-      marginBottom: 2
+      marginBottom: 2,
     },
     title: {
-      marginBottom: 2
+      textAlign: 'center',
+      marginBottom: 1,
     },
     paper: {
       padding: 2,
@@ -41,14 +42,18 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
       display: 'flex',
       justifyContent: 'space-between',
     },
+    fileInfoBox: {
+      display: 'flex',
+    },
     fileBox: {
       display: 'flex',
       alignItems: 'center',
     },
     fileName: {
+      fontSize: '24px',
       display: 'flex',
-      alignItems: 'center',
       marginLeft: 2,
+      minWidth: '100px'
     },
     message: {},
     errorMessage: {
@@ -58,20 +63,26 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
     browseFile: {},
     acceptedFile: {},
     remove: {
-      marginLeft: 1
+      marginLeft: 1,
     },
-    progressBarBackgroundColor: {},
+    progressBar: {
+      display: 'flex',
+      marginTop: 2,
+      width: '100%'
+    },
   };
 
   return (
     <Box sx={styles.wrapper}>
       <Paper sx={styles.paper}>
-        <Typography variant='h5' sx={styles.title}>Upload file</Typography>
-        <Box sx={styles.inner}>
+        <Box>
           <CSVReader
             config={csvConfig}
             onUploadAccepted={(results: any) => {
-              setItems(results.data);
+              const resultWithId = results.data.map(
+                (item: any, i: any = 0) => ({ ...item, id: i })
+              );
+              setItems(resultWithId);
             }}
           >
             {({
@@ -81,30 +92,41 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
               getRemoveFileProps,
             }: any) => (
               <>
-                <Box component='div' style={styles.csvReader}>
-                  <Button
-                    variant='contained'
-                    type='button'
-                    {...getRootProps()}
-                    style={styles.browseFile}
-                  >
-                    Browse file
-                  </Button>
-                  <Box component='div' style={styles.acceptedFile}>
-                    {acceptedFile && acceptedFile.name}
+                <Box sx={styles.inner}>
+                  <Box sx={styles.fileInfoBox}>
+                    <Box component='div' style={styles.acceptedFile}>
+                      <Typography variant='h5' sx={styles.title}>
+                        Upload file:
+                      </Typography>
+                      <Box component='div' style={styles.csvReader}>
+                        <Button
+                          variant='contained'
+                          type='button'
+                          {...getRootProps()}
+                          style={styles.browseFile}
+                        >
+                          Browse file
+                        </Button>
+                      </Box>
+                    </Box>
+                    <Box sx={styles.fileName}>
+                      <Typography variant='h5'>
+                        {acceptedFile && acceptedFile.name}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <ProgressBar style={styles.progressBarBackgroundColor} />
+                  <Box>
+                    <JsonToCSV data={items} />
+                    <Button
+                      variant='contained'
+                      sx={styles.remove}
+                      {...getRemoveFileProps()}
+                    >
+                      Remove
+                    </Button>
+                  </Box>
                 </Box>
-                <Box>
-                  <JsonToCSV data={items} />
-                  <Button
-                    variant='contained'
-                    sx={styles.remove}
-                    {...getRemoveFileProps()}
-                  >
-                    Remove
-                  </Button>
-                </Box>
+                <ProgressBar style={styles.progressBar} />
               </>
             )}
           </CSVReader>
