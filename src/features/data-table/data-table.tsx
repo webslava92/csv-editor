@@ -1,298 +1,262 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import React, { HTMLProps, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  flexRender,
-  RowData,
-  ColumnDef,
-  getSortedRowModel,
-  SortingState,
-} from '@tanstack/react-table';
+import React, {
+  ChangeEvent,
+  MouseEvent,
+  useCallback,
+  useState,
+  useEffect
+} from 'react';
 import {
   Box,
-  Button,
-  Checkbox,
-  IconButton,
-  Paper,
   Table,
   TableBody,
   TableCell,
-  TableHead,
+  TableContainer,
+  TablePagination,
   TableRow,
-  Typography
+  Paper,
+  Checkbox,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
-import { Delete, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-import { Filter } from './filter';
-import { defaultColumn } from './defaultColumn';
-import { TableFooter } from './tableFooter';
+import { DEFAULT_ORDER, DEFAULT_ORDER_BY, DEFAULT_ROWS_LIST, DEFAULT_ROWS_PER_PAGE } from './constants';
+import { Order } from './types';
+import { DataTableToolbar } from './data-table-toolbar';
+import { DataTableHead } from './data-table-head';
+import { EditableCell } from './editable-cell';
+import { getComparator, stableSort } from './helpers';
+import { Filters } from './filters';
 
-declare module '@tanstack/react-table' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface TableMeta<TData extends RowData> {
-    updateData: (
-      rowIndex: number,
-      columnId: string,
-      value: unknown
-    ) => void;
-  }
-}
-
-function useSkipper() {
-  const shouldSkipRef = useRef(true);
-  const shouldSkip = shouldSkipRef.current;
-
-  const skip = useCallback(() => {
-    shouldSkipRef.current = false;
-  }, []);
-
-  useEffect(() => {
-    shouldSkipRef.current = true;
-  });
-
-  return [shouldSkip, skip] as const;
-}
-
-export function DataTable({ data, setData }: any) {
-  const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [rowSelection, setRowSelection] = React.useState({});
+export function DataTable({ rows, setData }: any) {
+  const [order, setOrder] = useState<Order>(DEFAULT_ORDER);
+  const [orderBy, setOrderBy] = useState<any>(DEFAULT_ORDER_BY);
+  const [selected, setSelected] = useState<readonly string[]>([]);
+  const [page, setPage] = useState(0);
+  const [dense, setDense] = useState(false);
+  const [visibleRows, setVisibleRows] = useState<any[] | null>(null);
+  const [isEdit, setIsEdit] = useState<any>(false);
+  const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE);
+  const [paddingHeight, setPaddingHeight] = useState(0);
 
   const headers = Array.from(
-    new Set(data.map((obj: any) => Object.keys(obj))[0])
+    new Set(rows.map((obj: any) => Object.keys(obj))[0])
   );
 
-  const columnData: any[] = [];
-  headers.map((col: any, i: any) =>
-    columnData.push({
-      accessorKey: headers[i],
-      footer: (props: any) => props.column.id,
-    })
+  useEffect(() => {
+    let rowsOnMount = stableSort(
+      rows,
+      getComparator(DEFAULT_ORDER, DEFAULT_ORDER_BY)
+    );
+    rowsOnMount = rowsOnMount.slice(
+      0 * DEFAULT_ROWS_PER_PAGE,
+      0 * DEFAULT_ROWS_PER_PAGE + DEFAULT_ROWS_PER_PAGE
+    );
+
+    setVisibleRows(rowsOnMount);
+  }, [rows]);
+
+  const handleRequestSort = useCallback(
+    (event: MouseEvent<unknown>, newOrderBy: any) => {
+      const isAsc = orderBy === newOrderBy && order === 'asc';
+      const toggledOrder = isAsc ? 'desc' : 'asc';
+      setOrder(toggledOrder);
+      setOrderBy(newOrderBy);
+
+      const sortedRows = stableSort(
+        rows,
+        getComparator(toggledOrder, newOrderBy)
+      );
+      const updatedRows = sortedRows.slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      );
+      setVisibleRows(updatedRows);
+    },
+    [order, orderBy, page, rowsPerPage]
   );
 
-  const checkboxes = {
-    id: 'select',
-    header: useCallback(
-      ({ table }: any) => (
-        <Checkbox
-          checked={table.getIsAllRowsSelected()}
-          indeterminate={table.getIsSomeRowsSelected()}
-          onChange={table.getToggleAllRowsSelectedHandler()}
-        />
-      ),
-      []
-    ),
-    cell: useCallback(
-      ({ row }: any) => (
-        <Box component='div'>
-          <Checkbox
-            checked={row.getIsSelected()}
-            indeterminate={row.getIsSomeSelected()}
-            onChange={row.getToggleSelectedHandler()}
-          />
-        </Box>
-      ),
-      []
-    ),
+  const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = rows.map((n: any) => n.id);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
   };
 
-  const removeRow = (row: any) => {
-    const newData = data.filter((item: any) => item.id !== row.original.id);
-    setData(newData);
-    console.log('row', row);
-    console.log('newData', newData);
+  const handleClick = (event: MouseEvent<unknown>, name: string) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected: readonly string[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelected(newSelected);
   };
 
-  const actions = {
-    id: 'actions',
-    header: useCallback(
-      ({ table }: any) => (
-        <Box>Actions</Box>
-      ),
-      []
-    ),
-    cell: useCallback(
-      ({ row }: any) => (
-        <IconButton onClick={() => removeRow(row)}>
-          <Delete />
-        </IconButton>
-      ),
-      []
-    ),
-  };
+  const handleChangePage = React.useCallback(
+    (event: unknown, newPage: number) => {
+      setPage(newPage);
 
-  const columns = useMemo<ColumnDef<any>[]>(
-    () => [checkboxes, ...columnData, actions],
-    []
+      const sortedRows = stableSort(rows, getComparator(order, orderBy));
+      const updatedRows = sortedRows.slice(
+        newPage * rowsPerPage,
+        newPage * rowsPerPage + rowsPerPage
+      );
+      setVisibleRows(updatedRows);
+      const numEmptyRows =
+        newPage > 0
+          ? Math.max(0, (1 + newPage) * rowsPerPage - rows.length)
+          : 0;
+
+      const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
+      setPaddingHeight(newPaddingHeight);
+    },
+    [order, orderBy, dense, rowsPerPage]
   );
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      sorting,
-      rowSelection,
-    },
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    defaultColumn,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    autoResetPageIndex,
-    meta: {
-      updateData: (rowIndex, columnId, value) => {
-        skipAutoResetPageIndex();
-        setData((old: any[]) =>
-          old.map((row: any, index: number) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex]!,
-                [columnId]: value,
-              };
-            }
-            return row;
-          })
-        );
-      },
-    },
-    debugTable: true,
-  });
+  const handleChangeRowsPerPage = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const updatedRowsPerPage = parseInt(event.target.value, 10);
+      setRowsPerPage(updatedRowsPerPage);
 
-  const styles = {
-    wrapper: {
-      padding: 2,
+      setPage(0);
+
+      const sortedRows = stableSort(rows, getComparator(order, orderBy));
+      const updatedRows = sortedRows.slice(
+        0 * updatedRowsPerPage,
+        0 * updatedRowsPerPage + updatedRowsPerPage
+      );
+      setVisibleRows(updatedRows);
+
+      setPaddingHeight(0);
     },
-    head: {},
-    headerCellBox: {
-      display: 'flex',
-      alignItems: 'center',
-      marginTop: 3
-    },
-    headerTitle: {
-      fontSize: '1rem',
-      fontWeight: 700,
-      padding: 1,
-      marginRight: 1
-    },
-    headCell: {
-      padding: '2px',
-      border: 'none',
-    },
-    tableCell: {
-      padding: 0,
-      border: 'none',
-    },
+    [order, orderBy]
+  );
+
+  const handleChangeDense = (event: ChangeEvent<HTMLInputElement>) => {
+    setDense(event.target.checked);
   };
 
-  // const handleRemoveRow = () => {
-  //   const checkedRows = Object.keys(rowSelection).map((item) =>
-  //     parseInt(item, 10)
-  //   );
-  //   const findRow = table.options.data.find(
-  //     (item, index) => index === checkedRows[0]
-  //   );
-  //   const newData = data.filter((item: any) => item.id !== findRow.id);
-  //   setData(newData);
-  //   console.log('newData', newData);
-  // };
+  const isSelected = (id: string) => selected.indexOf(id) !== -1;
+
+  const handleCellChange = (value: any, rowId: any, columnId: any) => {
+    setData((prevData: any) => {
+      const newData = [...prevData];
+      newData[rowId][columnId] = value;
+      return newData;
+    });
+  };
 
   return (
-    <Paper sx={styles.wrapper}>
-      {/* <Button
-        onClick={handleRemoveRow}
-      >
-        Remove
-      </Button> */}
-      <Typography variant='h5'>Filters</Typography>
-      <Box>
-        <Table>
-          <TableHead sx={styles.head}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableCell
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    sx={styles.headCell}
-                  >
-                    {header.column.getCanFilter() ? (
-                      <Box sx={{ display: 'flex' }}>
-                        <Filter column={header.column} />
-                      </Box>
-                    ) : null}
-                    {header.isPlaceholder ? null : (
-                      <Box
-                        component='div'
-                        {...{
-                          className: header.column.getCanSort()
-                            ? 'cursor-pointer select-none'
-                            : '',
-                          onClick: header.column.getToggleSortingHandler(),
-                        }}
-                      >
-                        <Box sx={styles.headerCellBox}>
-                          {header.column.getCanSort() ? (
-                            <Typography
-                              variant='body1'
-                              sx={styles.headerTitle}
-                            >
-                              {header.column.id.charAt(0).toUpperCase() +
-                                header.column.id
-                                  .slice(1)
-                                  .split('_')
-                                  .join(' ')}
-                            </Typography>
-                          ) : null}
-                          {
-                            {
-                              asc: <KeyboardArrowUp />,
-                              desc: <KeyboardArrowDown />,
-                            }[header.column.getIsSorted() as string]
-                          }
-                        </Box>
-                      </Box>
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody sx={{ border: '1px solid #ccc' }}>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} sx={styles.tableCell}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
-      <TableFooter
-        setPageIndex={table.setPageIndex}
-        getCanPreviousPage={table.getCanPreviousPage}
-        previousPage={table.previousPage}
-        nextPage={table.nextPage}
-        getCanNextPage={table.getCanNextPage}
-        getPageCount={table.getPageCount}
-        getRowModel={table.getRowModel}
-        getState={table.getState}
-        setPageSize={table.setPageSize}
-        rowSelection={rowSelection}
-        table={table}
+    <Box sx={{ width: '100%' }}>
+      <Paper sx={{ width: '100%', mb: 2 }}>
+        <Filters filters={headers} />
+        <DataTableToolbar
+          rows={rows}
+          selected={selected}
+          setItems={setData}
+          isEdit={isEdit}
+          setIsEdit={setIsEdit}
+        />
+        <TableContainer sx={{ maxHeight: 440 }}>
+          <Table
+            sx={{ minWidth: 750 }}
+            aria-labelledby='tableTitle'
+            size={dense ? 'small' : 'medium'}
+          >
+            <DataTableHead
+              numSelected={selected.length}
+              order={order}
+              orderBy={orderBy}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={rows.length}
+              headers={headers}
+            />
+            <TableBody>
+              {visibleRows
+                ? visibleRows.map((row, rowIndex) => {
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${rowIndex}`;
+
+                  return (
+                    <TableRow
+                      hover
+                      onClick={(event) => handleClick(event, row.id)}
+                      role='checkbox'
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell padding='checkbox'>
+                        <Checkbox
+                          color='primary'
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                        />
+                      </TableCell>
+                      {Object.entries(row).map(
+                        (cellValue: any, cellIndex: any) => {
+                          const [key, value] = cellValue;
+                          return (
+                            <TableCell key={key} sx={{ padding: '2px' }}>
+                              <EditableCell
+                                value={value}
+                                rowId={row.id}
+                                columnId={key}
+                                onChange={handleCellChange}
+                                isEdit={isEdit}
+                              />
+                            </TableCell>
+                          );
+                        }
+                      )}
+                    </TableRow>
+                  );
+                })
+                : null}
+              {paddingHeight > 0 && (
+                <TableRow
+                  style={{
+                    height: paddingHeight,
+                  }}
+                >
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={DEFAULT_ROWS_LIST}
+          component='div'
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+      <FormControlLabel
+        control={<Switch checked={dense} onChange={handleChangeDense} />}
+        label='Compact table'
       />
-    </Paper>
+    </Box>
   );
 }

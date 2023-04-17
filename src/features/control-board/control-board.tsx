@@ -4,6 +4,7 @@ import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import { PeriodControl } from './period-control';
 import { DuplicateControl } from './dublicate-control';
+import { UploadFile } from './upload-file';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -80,12 +81,16 @@ export function ControlBoard({ data, setData }: any) {
             onChange={handleChangeTab}
             aria-label='Control Tabs'
           >
-            <Tab label='Period' {...a11yProps(0)} />
-            <Tab label='Duplicates' {...a11yProps(1)} />
-            <Tab label='Add row' {...a11yProps(1)} />
+            <Tab label='Upload' {...a11yProps(0)} />
+            <Tab label='Period' {...a11yProps(1)} />
+            <Tab label='Duplicates' {...a11yProps(2)} />
+            <Tab label='Add row' {...a11yProps(3)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
+          <UploadFile items={data} setItems={setData} />
+        </TabPanel>
+        <TabPanel value={value} index={1}>
           <PeriodControl
             fromValue={fromValue}
             setFromValue={setFromValue}
@@ -96,10 +101,10 @@ export function ControlBoard({ data, setData }: any) {
             setData={setData}
           />
         </TabPanel>
-        <TabPanel value={value} index={1}>
+        <TabPanel value={value} index={2}>
           <DuplicateControl data={data} setData={setData} />
         </TabPanel>
-        <TabPanel value={value} index={1}>
+        <TabPanel value={value} index={3}>
           Add Row
         </TabPanel>
       </Box>

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Box, useTheme } from '@mui/material';
-import { DataTable } from '@features/data-table';
+// import { DataTable } from '@features/data-table';
 import { TopBar } from '@features/top-bar/top-bar';
-import { UploadFile } from '@features/upload-file';
 import { ControlBoard } from '@features/control-board';
 import './App.css';
+import { DataTable } from '@features/data-table/data-table';
 
 export function App() {
   const [items, setItems] = useState<any>([]);
@@ -57,12 +57,10 @@ export function App() {
       <TopBar />
       <Box sx={styles.appInner}>
         <Box sx={styles.box}>
-          <Box>
-            <UploadFile items={items} setItems={setItems} />
-          </Box>
           <Box sx={styles.filesWrapper}>
             <ControlBoard data={items} setData={setItems} />
-            <DataTable data={items} setData={setItems} />
+            <DataTable rows={items} setData={setItems} />
+            {/* <DataTable data={items} setData={setItems} /> */}
           </Box>
         </Box>
       </Box>
