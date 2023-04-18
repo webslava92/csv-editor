@@ -5,7 +5,7 @@ import React, {
   MouseEvent,
   useCallback,
   useState,
-  useEffect
+  useEffect,
 } from 'react';
 import {
   Box,
@@ -18,9 +18,14 @@ import {
   Paper,
   Checkbox,
   FormControlLabel,
-  Switch
+  Switch,
 } from '@mui/material';
-import { DEFAULT_ORDER, DEFAULT_ORDER_BY, DEFAULT_ROWS_LIST, DEFAULT_ROWS_PER_PAGE } from './constants';
+import {
+  DEFAULT_ORDER,
+  DEFAULT_ORDER_BY,
+  DEFAULT_ROWS_LIST,
+  DEFAULT_ROWS_PER_PAGE,
+} from './constants';
 import { Order } from './types';
 import { DataTableToolbar } from './data-table-toolbar';
 import { DataTableHead } from './data-table-head';
@@ -38,6 +43,11 @@ export function DataTable({ rows, setData }: any) {
   const [isEdit, setIsEdit] = useState<any>(false);
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE);
   const [paddingHeight, setPaddingHeight] = useState(0);
+  const [filteredData, setFilteredData] = useState<any>([]);
+
+  useEffect(() => {
+    setFilteredData(rows);
+  }, [rows]);
 
   const headers = Array.from(
     new Set(rows.map((obj: any) => Object.keys(obj))[0])
@@ -45,16 +55,31 @@ export function DataTable({ rows, setData }: any) {
 
   useEffect(() => {
     let rowsOnMount = stableSort(
-      rows,
+      filteredData,
       getComparator(DEFAULT_ORDER, DEFAULT_ORDER_BY)
     );
+
     rowsOnMount = rowsOnMount.slice(
       0 * DEFAULT_ROWS_PER_PAGE,
       0 * DEFAULT_ROWS_PER_PAGE + DEFAULT_ROWS_PER_PAGE
     );
 
     setVisibleRows(rowsOnMount);
-  }, [rows]);
+  }, []);
+
+  useEffect(() => {
+    let updatedRows = stableSort(
+      filteredData,
+      getComparator(order, orderBy)
+    );
+
+    updatedRows = updatedRows.slice(
+      0 * rowsPerPage,
+      0 * rowsPerPage + rowsPerPage
+    );
+
+    setVisibleRows(updatedRows);
+  }, [filteredData]);
 
   const handleRequestSort = useCallback(
     (event: MouseEvent<unknown>, newOrderBy: any) => {
@@ -64,7 +89,7 @@ export function DataTable({ rows, setData }: any) {
       setOrderBy(newOrderBy);
 
       const sortedRows = stableSort(
-        rows,
+        filteredData,
         getComparator(toggledOrder, newOrderBy)
       );
       const updatedRows = sortedRows.slice(
@@ -78,7 +103,7 @@ export function DataTable({ rows, setData }: any) {
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n: any) => n.id);
+      const newSelected = filteredData.map((n: any) => n.id);
       setSelected(newSelected);
       return;
     }
@@ -109,7 +134,10 @@ export function DataTable({ rows, setData }: any) {
     (event: unknown, newPage: number) => {
       setPage(newPage);
 
-      const sortedRows = stableSort(rows, getComparator(order, orderBy));
+      const sortedRows = stableSort(
+        filteredData,
+        getComparator(order, orderBy)
+      );
       const updatedRows = sortedRows.slice(
         newPage * rowsPerPage,
         newPage * rowsPerPage + rowsPerPage
@@ -117,23 +145,27 @@ export function DataTable({ rows, setData }: any) {
       setVisibleRows(updatedRows);
       const numEmptyRows =
         newPage > 0
-          ? Math.max(0, (1 + newPage) * rowsPerPage - rows.length)
+          ? Math.max(0, (1 + newPage) * rowsPerPage - filteredData.length)
           : 0;
 
       const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
       setPaddingHeight(newPaddingHeight);
     },
-    [order, orderBy, dense, rowsPerPage]
+    [filteredData, order, orderBy, dense, rowsPerPage]
   );
 
   const handleChangeRowsPerPage = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const updatedRowsPerPage = parseInt(event.target.value, 10);
+
       setRowsPerPage(updatedRowsPerPage);
 
       setPage(0);
 
-      const sortedRows = stableSort(rows, getComparator(order, orderBy));
+      const sortedRows = stableSort(
+        filteredData,
+        getComparator(order, orderBy)
+      );
       const updatedRows = sortedRows.slice(
         0 * updatedRowsPerPage,
         0 * updatedRowsPerPage + updatedRowsPerPage
@@ -142,7 +174,7 @@ export function DataTable({ rows, setData }: any) {
 
       setPaddingHeight(0);
     },
-    [order, orderBy]
+    [filteredData, order, orderBy]
   );
 
   const handleChangeDense = (event: ChangeEvent<HTMLInputElement>) => {
@@ -162,13 +194,18 @@ export function DataTable({ rows, setData }: any) {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <Filters filters={headers} />
+        <Filters
+          headers={headers}
+          rows={filteredData}
+          setFilteredData={setFilteredData}
+        />
         <DataTableToolbar
-          rows={rows}
+          rows={filteredData}
           selected={selected}
           setItems={setData}
           isEdit={isEdit}
           setIsEdit={setIsEdit}
+          setSelected={setSelected}
         />
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table
@@ -182,7 +219,7 @@ export function DataTable({ rows, setData }: any) {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={filteredData.length}
               headers={headers}
             />
             <TableBody>
@@ -246,7 +283,7 @@ export function DataTable({ rows, setData }: any) {
         <TablePagination
           rowsPerPageOptions={DEFAULT_ROWS_LIST}
           component='div'
-          count={rows.length}
+          count={filteredData.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

@@ -29,6 +29,7 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
   const styles = {
     wrapper: {
       display: 'flex',
+      justifyContent: 'center',
     },
     title: {
       textAlign: 'center',
@@ -36,17 +37,22 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
     periodBox: {
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: { xs: 'column', md: 'row' },
+      gap: { xs: 2, md: 1 },
     },
     pickerBox: {
       position: 'relative',
     },
     periodPickerFrom: {
       display: 'flex',
-      marginRight: 1,
+      justifyContent: 'center',
+      flexDirection: { xs: 'column', md: 'row' },
     },
     periodPickerTo: {
       display: 'flex',
-      marginLeft: 1,
+      justifyContent: 'center',
+      flexDirection: { xs: 'column', md: 'row' },
     },
     helperText: {
       color: 'red',
@@ -55,17 +61,17 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
       position: 'absolute',
       left: 0,
       right: 0,
+      bottom: '-16px',
     },
   };
 
   return (
     <Box sx={styles.wrapper}>
       <Box component='div'>
-        {/* <Typography variant='h6' sx={styles.title}>
-          {''}
-        </Typography> */}
         <Box sx={styles.periodBox}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+          >
             <Box sx={styles.pickerBox}>
               <DateTimePicker
                 label='Choose the initial period'
@@ -86,11 +92,17 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
                 }}
                 sx={styles.periodPickerFrom}
               />
-              <Typography sx={styles.helperText}>{''}</Typography>
             </Box>
           </LocalizationProvider>
-          <Typography variant='body1'>-</Typography>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Typography
+            variant='body1'
+            sx={{ display: { xs: 'none', md: 'block' } }}
+          >
+            -
+          </Typography>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+          >
             <Box sx={styles.pickerBox}>
               <DateTimePicker
                 label='Choose the end period'

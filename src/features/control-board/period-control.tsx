@@ -41,7 +41,7 @@ export function PeriodControl({
         {},
         ...Object.entries(item).map(([key, val]: any) => ({
           [key]:
-            dayjs(val).isValid() && key !== 'phone'
+            dayjs(val).isValid() && key !== 'phone' && key !== 'id'
               ? randomDate(fromValue, toValue)
               : val,
         }))
@@ -53,9 +53,23 @@ export function PeriodControl({
   const isDisabled = dayjs(fromValue).isSame(toValue);
 
   const styles = {
-    wrapper: { display: 'flex', justifyContent: 'space-between' },
-    pickersBox: { display: 'flex', gap: 1 },
-    btnBox: { display: 'flex', gap: 1 },
+    wrapper: {
+      display: 'flex',
+      alignItems: 'top',
+      justifyContent: 'space-between',
+      flexDirection: { xs: 'column', md: 'row' },
+    },
+    pickersBox: {
+      display: 'flex',
+      alignItems: 'top',
+      gap: 1,
+      flexDirection: { xs: 'column', md: 'row' },
+    },
+    btnBox: { display: 'flex', justifyContent: 'center', gap: 1 },
+    btn: {
+      display: 'flex',
+      marginTop: { xs: 1, md: 0 },
+    },
   };
 
   return (
@@ -68,12 +82,24 @@ export function PeriodControl({
           setToValue={setToValue}
           error={error}
         />
-        <Button variant='contained' disabled={isDisabled} onClick={handleResetDates}>
-          Reset Dates
-        </Button>
       </Box>
       <Box sx={styles.btnBox}>
-        <Button variant='contained' disabled={isDisabled} onClick={handleChangeDates}>
+        <Box sx={styles.btnBox}>
+          <Button
+            variant='contained'
+            disabled={isDisabled}
+            onClick={handleResetDates}
+            sx={styles.btn}
+          >
+            Reset Dates
+          </Button>
+        </Box>
+        <Button
+          variant='contained'
+          disabled={isDisabled}
+          onClick={handleChangeDates}
+          sx={styles.btn}
+        >
           Change Dates
         </Button>
       </Box>

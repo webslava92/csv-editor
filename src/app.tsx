@@ -60,7 +60,6 @@ export function App() {
           <Box sx={styles.filesWrapper}>
             <ControlBoard data={items} setData={setItems} />
             <DataTable rows={items} setData={setItems} />
-            {/* <DataTable data={items} setData={setItems} /> */}
           </Box>
         </Box>
       </Box>

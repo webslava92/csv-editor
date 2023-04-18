@@ -40,6 +40,7 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
     },
     fileInfoBox: {
       display: 'flex',
+      alignItems: 'flex-end'
     },
     fileBox: {
       display: 'flex',

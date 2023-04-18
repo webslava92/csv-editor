@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import dayjs from 'dayjs';
 import * as isBetween from 'dayjs/plugin/isBetween';
@@ -15,15 +15,11 @@ export function DuplicateControl({
   data,
   setData,
 }: Props) {
-  const [keys, setKeys] = useState<any[]>(['']);
   const [key, setKey] = useState<string>('');
 
-  useEffect(() => {
-    const newKeys = Array.from(
-      new Set(data.map((obj: any) => Object.keys(obj))[0])
-    );
-    setKeys(newKeys);
-  }, [data]);
+  const keys = Array.from(
+    new Set(data.map((obj: any) => Object.keys(obj))[0])
+  );
 
   function duplicateRemover(arr: any, keyForFilter: string) {
     const unique = arr.filter(
@@ -42,10 +38,21 @@ export function DuplicateControl({
   };
 
   const styles = {
-    wrapper: { display: 'flex', justifyContent: 'space-between' },
-    pickerBox: { display: 'flex', gap: 1 },
-    selectControl: { minWidth: '300px' },
-    btnBox: { display: 'flex', gap: 1 },
+    wrapper: {
+      display: 'flex',
+      justifyContent: { xs: 'center', md: 'space-between' },
+      flexDirection: { xs: 'column', md: 'row' },
+    },
+    pickerBox: {
+      margin: { xs: '0 auto', md: 0 },
+    },
+    selectControl: { minWidth: '250px' },
+    btnBox: {
+      display: 'flex',
+      justifyContent: 'center',
+      gap: 1,
+      marginTop: { xs: 2, md: 0 },
+    },
   };
 
   return (
@@ -66,15 +73,17 @@ export function DuplicateControl({
             onChange={(e) => {
               setKey(String(e.target.value));
             }}
-            size='small'
+            // size='small'
           >
-            {keys.map((item) => (
+            {keys.map((item: any) => (
               <MenuItem key={item} value={item}>
                 {item}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+      </Box>
+      <Box sx={styles.btnBox}>
         <Button
           variant='contained'
           disabled={key === ''}
@@ -82,8 +91,6 @@ export function DuplicateControl({
         >
           Reset Key
         </Button>
-      </Box>
-      <Box sx={styles.btnBox}>
         <Button
           variant='contained'
           disabled={key === ''}

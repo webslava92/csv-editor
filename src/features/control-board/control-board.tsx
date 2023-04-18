@@ -25,7 +25,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ paddingTop: 3 }}>
           <Box>{children}</Box>
         </Box>
       )}
@@ -81,10 +81,10 @@ export function ControlBoard({ data, setData }: any) {
             onChange={handleChangeTab}
             aria-label='Control Tabs'
           >
-            <Tab label='Upload' {...a11yProps(0)} />
+            <Tab label='File' {...a11yProps(0)} />
             <Tab label='Period' {...a11yProps(1)} />
             <Tab label='Duplicates' {...a11yProps(2)} />
-            <Tab label='Add row' {...a11yProps(3)} />
+            <Tab label='Adding' {...a11yProps(3)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -105,7 +105,7 @@ export function ControlBoard({ data, setData }: any) {
           <DuplicateControl data={data} setData={setData} />
         </TabPanel>
         <TabPanel value={value} index={3}>
-          Add Row
+          Adding
         </TabPanel>
       </Box>
     </Paper>

@@ -1,7 +1,13 @@
 import React from 'react';
-import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { Edit } from '@mui/icons-material';
+import { Edit, EditOff } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
@@ -11,14 +17,25 @@ interface DataTableToolbarProps {
   isEdit: boolean;
   setIsEdit: Function;
   setItems: Function;
+  setSelected: Function;
 }
 
 export function DataTableToolbar(props: DataTableToolbarProps) {
-  const { rows, selected, isEdit, setIsEdit, setItems } = props;
+  const { rows, selected, isEdit, setIsEdit, setItems, setSelected } =
+    props;
 
-  function handleDataRemove(objects: any, ids: any) {
-    const newData = objects.filter((obj: any) => !ids.includes(obj.id));
+  const handleOnEdit = () => {
+    setIsEdit(true);
+  };
+
+  const handleOffEdit = () => {
+    setIsEdit(false);
+  };
+
+  function handleDataRemove(items: any, ids: any) {
+    const newData = items.filter((obj: any) => !ids.includes(obj.id));
     setItems(newData);
+    setSelected([]);
   }
 
   return (
@@ -54,13 +71,22 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
           Items
         </Typography>
       )}
-      {selected.length > 0 ? (
-        <Box sx={{ display: 'flex' }}>
-          <Tooltip title='Edit mode'>
-            <IconButton onClick={() => setIsEdit(!isEdit)}>
+
+      <Box sx={{ display: 'flex' }}>
+        {!isEdit ? (
+          <Tooltip title='Enable editing mode'>
+            <IconButton onClick={handleOnEdit}>
               <Edit />
             </IconButton>
           </Tooltip>
+        ) : (
+          <Tooltip title='Turn off editing mode'>
+            <IconButton onClick={handleOffEdit}>
+              <EditOff />
+            </IconButton>
+          </Tooltip>
+        )}
+        {selected.length > 0 ? (
           <Tooltip title='Delete'>
             <IconButton
               onClick={() => {
@@ -70,21 +96,14 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
               <DeleteIcon />
             </IconButton>
           </Tooltip>
-        </Box>
-      ) : (
-        <Box sx={{ display: 'flex' }}>
-          <Tooltip title='Edit mode'>
-            <IconButton onClick={() => setIsEdit(!isEdit)}>
-              <Edit />
-            </IconButton>
-          </Tooltip>
+        ) : (
           <Tooltip title='Filter list'>
             <IconButton>
               <FilterListIcon />
             </IconButton>
           </Tooltip>
-        </Box>
-      )}
+        )}
+      </Box>
     </Toolbar>
   );
 }

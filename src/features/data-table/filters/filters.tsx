@@ -1,35 +1,60 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react';
-import { Box, Grid, TextField, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, TextField, Typography } from '@mui/material';
 
-export function Filters({ filters }: any) {
-  const [value, setValue] = useState('');
-  // const [filters, setFilters] = useState({});
+export function Filters({ headers, rows, setFilteredData }: any) {
+  const [filters, setFilters] = useState<any>({});
 
+  const applyFilters = (newFilters: { [x: string]: any; }) => {
+    let filtered = [...rows];
+    Object.keys(newFilters).forEach((key) => {
+      const value = newFilters[key];
+      if (value) {
+        filtered = filtered.filter((item) => {
+          const itemValue = item[key].toString().toLowerCase();
+          return itemValue.indexOf(value.toLowerCase()) !== -1;
+        });
+      }
+    });
+    setFilteredData(filtered);
+  };
 
-  console.log('filters', filters);
+  const handleFilterChange = (event: { target: { value: any; }; }, key: string | number) => {
+    const newFilters = { ...filters };
+    newFilters[key] = event.target.value;
+    setFilters(newFilters);
+    applyFilters(newFilters);
+  };
+
+  const clearFilters = () => {
+    setFilters({});
+    setFilteredData(rows);
+  };
 
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant='h5' sx={{ marginBottom: 1 }}>
         Filters
       </Typography>
-      <Grid container spacing={1}>
-        {filters.map((filter: any) => (
-          <Grid item key={filter}>
-            <TextField
-              type='text'
-              label={filter}
-              value={(value ?? '') as string}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder={'Search...'}
-              size='small'
-              sx={{ width: '100%' }}
-            />
-          </Grid>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+        {headers.map((key: any) => (
+          <TextField
+            key={key}
+            label={key}
+            name={key}
+            value={filters[key]}
+            onChange={(event) => handleFilterChange(event, key)}
+            variant='outlined'
+            style={{ marginRight: 10 }}
+          />
         ))}
-      </Grid>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          <Button onClick={clearFilters} variant='contained'>
+            Reset filters
+          </Button>
+        </Box>
+      </Box>
     </Box>
   );
 }
