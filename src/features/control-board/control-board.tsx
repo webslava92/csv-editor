@@ -5,6 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { PeriodControl } from './period-control';
 import { DuplicateControl } from './dublicate-control';
 import { UploadFile } from './upload-file';
+import { AddingControl } from './adding-control/adding-control';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -105,7 +106,7 @@ export function ControlBoard({ data, setData }: any) {
           <DuplicateControl data={data} setData={setData} />
         </TabPanel>
         <TabPanel value={value} index={3}>
-          Adding
+          <AddingControl data={data} setData={setData} />
         </TabPanel>
       </Box>
     </Paper>

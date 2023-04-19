@@ -83,7 +83,8 @@
     "tsc": "tsc",
     "electron:dev": "concurrently -k \"tsc -w\" \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
     "electron:build": "yarn build && electron-builder -c.extraMetadata.main=dist/electron.js",
-    "electron:start": "wait-on tcp:127.0.0.1:3000 && electron ."
+    "electron:start": "wait-on tcp:127.0.0.1:3000 && electron .",
+    "electron:build-linux": "electron-builder --linux"
   },
   "browserslist": {
     "production": [

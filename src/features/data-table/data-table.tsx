@@ -45,6 +45,9 @@ export function DataTable({ rows, setData }: any) {
   const [paddingHeight, setPaddingHeight] = useState(0);
   const [filteredData, setFilteredData] = useState<any>([]);
 
+  console.log('rows', rows);
+  console.log('filteredData', filteredData);
+
   useEffect(() => {
     setFilteredData(rows);
   }, [rows]);
@@ -98,7 +101,7 @@ export function DataTable({ rows, setData }: any) {
       );
       setVisibleRows(updatedRows);
     },
-    [order, orderBy, page, rowsPerPage]
+    [rows, order, orderBy, page, rowsPerPage]
   );
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
@@ -151,7 +154,7 @@ export function DataTable({ rows, setData }: any) {
       const newPaddingHeight = (dense ? 33 : 53) * numEmptyRows;
       setPaddingHeight(newPaddingHeight);
     },
-    [filteredData, order, orderBy, dense, rowsPerPage]
+    [rows, filteredData, order, orderBy, dense, rowsPerPage]
   );
 
   const handleChangeRowsPerPage = useCallback(
@@ -196,7 +199,7 @@ export function DataTable({ rows, setData }: any) {
       <Paper sx={{ width: '100%', mb: 2 }}>
         <Filters
           headers={headers}
-          rows={filteredData}
+          rows={rows}
           setFilteredData={setFilteredData}
         />
         <DataTableToolbar

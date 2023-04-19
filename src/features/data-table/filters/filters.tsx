@@ -1,10 +1,12 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import { isEmpty } from 'lodash';
 
 export function Filters({ headers, rows, setFilteredData }: any) {
   const [filters, setFilters] = useState<any>({});
+  const isFilters = isEmpty(filters);
 
   const applyFilters = (newFilters: { [x: string]: any; }) => {
     let filtered = [...rows];
@@ -43,14 +45,19 @@ export function Filters({ headers, rows, setFilteredData }: any) {
             key={key}
             label={key}
             name={key}
-            value={filters[key]}
+            value={filters[key] || ''}
             onChange={(event) => handleFilterChange(event, key)}
             variant='outlined'
             style={{ marginRight: 10 }}
+            size='small'
           />
         ))}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          <Button onClick={clearFilters} variant='contained'>
+          <Button
+            onClick={clearFilters}
+            variant='contained'
+            disabled={isFilters}
+          >
             Reset filters
           </Button>
         </Box>
