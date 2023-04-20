@@ -1,9 +1,11 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-console */
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import dayjs from 'dayjs';
 import * as isBetween from 'dayjs/plugin/isBetween';
 import { PeriodPicker } from './period-picker';
+import { PeriodFormat } from './period-format';
 
 dayjs.extend(isBetween as any);
 
@@ -15,6 +17,8 @@ type Props = {
   error: string;
   data: any;
   setData: Function;
+  format: string;
+  setFormat: Function;
 };
 
 export function PeriodControl({
@@ -25,6 +29,8 @@ export function PeriodControl({
   error,
   data,
   setData,
+  format,
+  setFormat,
 }: Props) {
   const handleResetDates = () => {
     setFromValue(dayjs());
@@ -42,7 +48,9 @@ export function PeriodControl({
         ...Object.entries(item).map(([key, val]: any) => ({
           [key]:
             dayjs(val).isValid() && key !== 'phone' && key !== 'id'
-              ? randomDate(fromValue, toValue)
+              ? dayjs(val).isBetween(fromValue, toValue)
+                ? val
+                : randomDate(fromValue, toValue)
               : val,
         }))
       )
@@ -82,6 +90,7 @@ export function PeriodControl({
           setToValue={setToValue}
           error={error}
         />
+        <PeriodFormat format={format} setFormat={setFormat} />
       </Box>
       <Box sx={styles.btnBox}>
         <Box sx={styles.btnBox}>

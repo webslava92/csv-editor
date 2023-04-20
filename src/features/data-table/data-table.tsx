@@ -17,8 +17,6 @@ import {
   TableRow,
   Paper,
   Checkbox,
-  FormControlLabel,
-  Switch,
 } from '@mui/material';
 import {
   DEFAULT_ORDER,
@@ -33,7 +31,13 @@ import { EditableCell } from './editable-cell';
 import { getComparator, stableSort } from './helpers';
 import { Filters } from './filters';
 
-export function DataTable({ rows, setData }: any) {
+interface FormProps {
+  rows: Record<string, any>[];
+  setData: Function;
+  format: string;
+}
+
+export function DataTable({ rows, setData, format }: FormProps) {
   const [order, setOrder] = useState<Order>(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = useState<any>(DEFAULT_ORDER_BY);
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -44,9 +48,6 @@ export function DataTable({ rows, setData }: any) {
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE);
   const [paddingHeight, setPaddingHeight] = useState(0);
   const [filteredData, setFilteredData] = useState<any>([]);
-
-  console.log('rows', rows);
-  console.log('filteredData', filteredData);
 
   useEffect(() => {
     setFilteredData(rows);
@@ -180,10 +181,6 @@ export function DataTable({ rows, setData }: any) {
     [filteredData, order, orderBy]
   );
 
-  const handleChangeDense = (event: ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
-  };
-
   const isSelected = (id: string) => selected.indexOf(id) !== -1;
 
   const handleCellChange = (value: any, rowId: any, columnId: any) => {
@@ -209,9 +206,12 @@ export function DataTable({ rows, setData }: any) {
           isEdit={isEdit}
           setIsEdit={setIsEdit}
           setSelected={setSelected}
+          dense={dense}
+          setDense={setDense}
         />
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table
+            stickyHeader
             sx={{ minWidth: 750 }}
             aria-labelledby='tableTitle'
             size={dense ? 'small' : 'medium'}
@@ -234,7 +234,6 @@ export function DataTable({ rows, setData }: any) {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.id)}
                       role='checkbox'
                       aria-checked={isItemSelected}
                       tabIndex={-1}
@@ -246,27 +245,29 @@ export function DataTable({ rows, setData }: any) {
                         <Checkbox
                           color='primary'
                           checked={isItemSelected}
+                          onClick={(event) => handleClick(event, row.id)}
                           inputProps={{
                             'aria-labelledby': labelId,
                           }}
                         />
                       </TableCell>
-                      {Object.entries(row).map(
-                        (cellValue: any, cellIndex: any) => {
-                          const [key, value] = cellValue;
-                          return (
-                            <TableCell key={key} sx={{ padding: '2px' }}>
-                              <EditableCell
-                                value={value}
-                                rowId={row.id}
-                                columnId={key}
-                                onChange={handleCellChange}
-                                isEdit={isEdit}
-                              />
-                            </TableCell>
-                          );
-                        }
-                      )}
+                      {Object.entries(row).map((cellValue: any) => {
+                        const [key, value] = cellValue;
+
+                        return (
+                          <TableCell key={key} sx={{ padding: '2px' }}>
+                            <EditableCell
+                              value={value}
+                              rowId={row.id}
+                              columnId={key}
+                              onChange={handleCellChange}
+                              isEdit={isEdit}
+                              format={format}
+                              selected={selected}
+                            />
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   );
                 })
@@ -293,10 +294,6 @@ export function DataTable({ rows, setData }: any) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label='Compact table'
-      />
     </Box>
   );
 }

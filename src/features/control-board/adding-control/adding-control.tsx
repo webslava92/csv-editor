@@ -11,15 +11,16 @@ import { CalendarMonth } from '@mui/icons-material';
 interface FormProps {
   data: Record<string, any>[];
   setData: Function;
+  format: string;
 }
 
-export function AddingControl({ data, setData }: FormProps) {
+export function AddingControl({ data, setData, format }: FormProps) {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [newData, setNewData] = useState<Record<string, any>[]>([]);
 
-  const fieldOrder = Object.keys(data[0]);
+  const fieldOrder = data.length && Object.keys(data[0]);
 
-  const fields = Object.entries(data[0]).map((item: any) => ({
+  const fields = data.length && Object.entries(data[0]).map((item: any) => ({
     [item[0]]: !!(
       dayjs(item[1]).isValid() &&
       item[0] !== 'phone' &&
@@ -27,13 +28,8 @@ export function AddingControl({ data, setData }: FormProps) {
     ),
   }));
 
-  console.log('fields', fields);
-  console.log('fieldOrder', fieldOrder);
-  console.log('data', data);
-
-
   useEffect(() => {
-    if (!isEmpty(newData)) {
+    if (data.length && !isEmpty(newData)) {
       setData([...data, newData[0]]);
     }
   }, [newData]);
@@ -55,17 +51,21 @@ export function AddingControl({ data, setData }: FormProps) {
       ...formData,
       id: data.length,
     };
-    const orderedData = fieldOrder.reduce(
-      (acc, key: string) => ({ ...acc, [key]: dataWithId[key] }),
-      {}
-    );
-    setNewData((prevData) => [...prevData, orderedData]);
+    const orderedData =
+      fieldOrder &&
+      fieldOrder.reduce(
+        (acc, key: string) => ({ ...acc, [key]: dataWithId[key] }),
+        {}
+      );
+    if (data.length) {
+      setNewData((prevData: any) => [...prevData, orderedData]);
+    }
     setFormData({});
   };
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-      {fields.map((field: Record<string, any>) =>
+      {data.length && fields && fields.map((field: Record<string, any>) =>
         (Object.entries(field)[0][1] ? (
           <LocalizationProvider
             dateAdapter={AdapterDayjs}
@@ -74,7 +74,7 @@ export function AddingControl({ data, setData }: FormProps) {
             <Box>
               <DateTimePicker
                 label='Registration date'
-                format='DD.MM.YYYY hh:mm:ss'
+                format={format}
                 value={formData[Object.entries(field)[0][0]] || dayjs()}
                 onChange={handleInputChange}
                 slotProps={{

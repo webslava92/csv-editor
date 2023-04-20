@@ -1,15 +1,16 @@
+/* eslint-disable no-console */
 import React, { useState } from 'react';
-import { Box, useTheme } from '@mui/material';
-// import { DataTable } from '@features/data-table';
+import { Box, Paper, useTheme } from '@mui/material';
 import { TopBar } from '@features/top-bar/top-bar';
 import { ControlBoard } from '@features/control-board';
 import './App.css';
 import { DataTable } from '@features/data-table/data-table';
 
-export function App() {
+export function App({ theme, setTheme }: any) {
   const [items, setItems] = useState<any>([]);
+  const [format, setFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
+  const themeUse = useTheme();
 
-  const theme = useTheme();
   const styles = {
     app: {
       position: 'relative',
@@ -27,13 +28,13 @@ export function App() {
       width: '100%',
       margin: '0 auto',
       padding: '16px',
-      backgroundColor: theme.palette.primary.contrastText,
+      backgroundColor: themeUse.palette.primary.contrastText,
     },
     adress: {
       display: 'flex',
       fontSize: '0.9rem',
       fontWeight: 700,
-      color: theme.palette.primary.main,
+      color: themeUse.palette.primary.main,
       margin: '16px auto 0',
       textAlign: 'center',
       minHeight: '1.8rem',
@@ -43,26 +44,33 @@ export function App() {
       marginTop: '16px',
       marginBottom: '16px',
       '& .MuiInput-underline:after': {
-        color: theme.palette.primary.main,
+        color: themeUse.palette.primary.main,
       },
     },
     filesWrapper: {
-      backgroundColor: theme.palette.primary.contrastText,
+      backgroundColor: themeUse.palette.primary.contrastText,
       boxSizing: 'border-box',
     },
   };
 
   return (
-    <Box sx={styles.app}>
+    <Paper sx={styles.app}>
       <TopBar />
       <Box sx={styles.appInner}>
         <Box sx={styles.box}>
           <Box sx={styles.filesWrapper}>
-            <ControlBoard data={items} setData={setItems} />
-            <DataTable rows={items} setData={setItems} />
+            <ControlBoard
+              data={items}
+              setData={setItems}
+              format={format}
+              setFormat={setFormat}
+              theme={theme}
+              setTheme={setTheme}
+            />
+            <DataTable rows={items} setData={setItems} format={format} />
           </Box>
         </Box>
       </Box>
-    </Box>
+    </Paper>
   );
 }

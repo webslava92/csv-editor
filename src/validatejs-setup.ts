@@ -6,6 +6,6 @@ validate.extend(validate.validators.datetime, {
     return value.valueOf();
   },
   format(value: number) {
-    return dayjs(value).format('HH:mm:ss');
+    return dayjs(value).utc().format('HH:mm:ss');
   },
 });

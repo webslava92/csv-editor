@@ -75,7 +75,7 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
             <Box sx={styles.pickerBox}>
               <DateTimePicker
                 label='Choose the initial period'
-                format='DD.MM.YYYY hh:mm:ss'
+                format='DD.MM.YYYY HH:mm:ss'
                 value={fromValue}
                 onChange={handleChangeFromValue}
                 slotProps={{
@@ -106,7 +106,7 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
             <Box sx={styles.pickerBox}>
               <DateTimePicker
                 label='Choose the end period'
-                format='DD.MM.YYYY hh:mm:ss'
+                format='DD.MM.YYYY HH:mm:ss'
                 value={toValue}
                 onChange={handleChangeToValue}
                 slotProps={{

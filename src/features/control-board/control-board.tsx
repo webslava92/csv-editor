@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
-import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Tab, Tabs, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
+import { WbSunny } from '@mui/icons-material';
 import { PeriodControl } from './period-control';
 import { DuplicateControl } from './dublicate-control';
 import { UploadFile } from './upload-file';
@@ -41,7 +42,7 @@ function a11yProps(index: number) {
   };
 }
 
-export function ControlBoard({ data, setData }: any) {
+export function ControlBoard({ data, setData, format, setFormat, theme, setTheme }: any) {
   const [fromValue, setFromValue] = useState<Dayjs | null>(dayjs());
   const [toValue, setToValue] = useState<Dayjs | null>(dayjs());
   const [error, setError] = useState<string>('');
@@ -65,16 +66,28 @@ export function ControlBoard({ data, setData }: any) {
       padding: 2,
       marginBottom: 2,
     },
-    title: {
+    top: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 1,
       marginBottom: 2,
     },
+    title: {},
   };
 
   return (
     <Paper sx={styles.wrapper}>
-      <Typography variant='h5' sx={styles.title}>
-        Controls
-      </Typography>
+      <Box sx={styles.top}>
+        <Typography variant='h5' sx={styles.title}>
+          Controls
+        </Typography>
+        <IconButton
+          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+        >
+          <WbSunny />
+        </IconButton>
+      </Box>
       <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs
@@ -89,7 +102,7 @@ export function ControlBoard({ data, setData }: any) {
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
-          <UploadFile items={data} setItems={setData} />
+          <UploadFile items={data} setItems={setData} format={format} />
         </TabPanel>
         <TabPanel value={value} index={1}>
           <PeriodControl
@@ -100,13 +113,15 @@ export function ControlBoard({ data, setData }: any) {
             error={error}
             data={data}
             setData={setData}
+            format={format}
+            setFormat={setFormat}
           />
         </TabPanel>
         <TabPanel value={value} index={2}>
           <DuplicateControl data={data} setData={setData} />
         </TabPanel>
         <TabPanel value={value} index={3}>
-          <AddingControl data={data} setData={setData} />
+          <AddingControl data={data} setData={setData} format={format} />
         </TabPanel>
       </Box>
     </Paper>

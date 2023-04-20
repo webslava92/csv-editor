@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 import React, { useState } from 'react';
 import { useCSVReader } from 'react-papaparse';
 // import dayjs from 'dayjs';
 import { Box, Button, Typography } from '@mui/material';
+import dayjs from 'dayjs';
 import { UploadFileProps } from './types';
 import { JsonToCSV } from './jsonToCsv';
 
@@ -18,8 +20,9 @@ const csvConfig = {
   // columns: null,
 };
 
-export function UploadFile({ items, setItems }: UploadFileProps) {
+export function UploadFile({ items, setItems, format }: UploadFileProps) {
   const [defaultData, setDefaultData] = useState<any>([]);
+  const [fileName, setFileName] = useState<string>('');
   const { CSVReader } = useCSVReader();
 
   const styles = {
@@ -28,7 +31,8 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
       marginBottom: 2,
     },
     title: {
-      textAlign: 'center',
+      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.4rem' },
+      fontWeight: 700,
       marginBottom: 1,
     },
     paper: {
@@ -37,17 +41,19 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
     inner: {
       display: 'flex',
       justifyContent: 'space-between',
+      flexDirection: { xs: 'column', md: 'row' },
     },
     fileInfoBox: {
       display: 'flex',
-      alignItems: 'flex-end'
+      gap: 1,
     },
     fileBox: {
       display: 'flex',
       alignItems: 'center',
     },
     fileName: {
-      fontSize: '24px',
+      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.4rem' },
+      fontWeight: 700,
       display: 'flex',
       marginLeft: 2,
       minWidth: '100px',
@@ -56,9 +62,16 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
     errorMessage: {
       color: 'red',
     },
-    csvReader: {},
+    acceptedFile: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 1,
+    },
+    fileNameBox: {
+      display: 'flex',
+      gap: 1,
+    },
     browseFile: {},
-    acceptedFile: {},
     remove: {
       marginLeft: 1,
     },
@@ -67,34 +80,56 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
       marginTop: 2,
       width: '100%',
     },
+    btnBox: {
+      marginTop: { xs: 2, md: 0 },
+    },
   };
+
+  const dataWithoitId = items.map((item: any) => {
+    const objCopy = { ...item };
+    delete objCopy.id;
+    return objCopy;
+  });
+
+  const newData = dataWithoitId.map((item: any) =>
+    Object.assign(
+      {},
+      ...Object.entries(item).map(([key, val]: any) => ({
+        [key]:
+          dayjs(val).isValid() && key !== 'phone' && key !== 'id'
+            ? dayjs(val).format(format)
+            : val,
+      }))
+    )
+  );
 
   return (
     <Box sx={styles.wrapper}>
       <CSVReader
         config={csvConfig}
-        onUploadAccepted={(results: any) => {
+        onUploadAccepted={(results: any, acceptedFile: any) => {
           const resultWithId = results.data.map(
             (item: any, i: any = 0) => ({ ...item, id: i })
           );
+          setFileName(acceptedFile.name);
           setItems(resultWithId);
           setDefaultData(resultWithId);
         }}
       >
-        {({
-          getRootProps,
-          acceptedFile,
-          ProgressBar,
-          getRemoveFileProps,
-        }: any) => (
+        {({ getRootProps, ProgressBar, getRemoveFileProps }: any) => (
           <>
             <Box sx={styles.inner}>
               <Box sx={styles.fileInfoBox}>
-                <Box component='div' style={styles.acceptedFile}>
-                  <Typography variant='h5' sx={styles.title}>
-                    Upload file:
-                  </Typography>
-                  <Box component='div' style={styles.csvReader}>
+                <Box component='div' sx={styles.acceptedFile}>
+                  <Box sx={styles.fileNameBox}>
+                    <Typography variant='h5' sx={styles.title}>
+                      Upload file:
+                    </Typography>
+                    <Typography variant='body1' sx={styles.fileName}>
+                      {fileName}
+                    </Typography>
+                  </Box>
+                  <Box>
                     <Button
                       variant='contained'
                       type='button'
@@ -105,14 +140,9 @@ export function UploadFile({ items, setItems }: UploadFileProps) {
                     </Button>
                   </Box>
                 </Box>
-                <Box sx={styles.fileName}>
-                  <Typography variant='h5'>
-                    {acceptedFile && acceptedFile.name}
-                  </Typography>
-                </Box>
               </Box>
-              <Box>
-                <JsonToCSV data={items} />
+              <Box sx={styles.btnBox}>
+                <JsonToCSV data={newData} fileName={fileName} />
                 <Button
                   variant='contained'
                   sx={styles.remove}

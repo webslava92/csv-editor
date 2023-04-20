@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import {
   Box,
@@ -7,9 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { Edit, EditOff } from '@mui/icons-material';
+import { Edit, EditOff, FormatAlignJustify, TableRows } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
 
 interface DataTableToolbarProps {
   rows: any[];
@@ -18,11 +18,21 @@ interface DataTableToolbarProps {
   setIsEdit: Function;
   setItems: Function;
   setSelected: Function;
+  dense: boolean;
+  setDense: Function;
 }
 
 export function DataTableToolbar(props: DataTableToolbarProps) {
-  const { rows, selected, isEdit, setIsEdit, setItems, setSelected } =
-    props;
+  const {
+    rows,
+    selected,
+    isEdit,
+    setIsEdit,
+    setItems,
+    setSelected,
+    dense,
+    setDense,
+  } = props;
 
   const handleOnEdit = () => {
     setIsEdit(true);
@@ -30,6 +40,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
 
   const handleOffEdit = () => {
     setIsEdit(false);
+    setSelected([]);
   };
 
   function handleDataRemove(items: any, ids: any) {
@@ -73,6 +84,19 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
       )}
 
       <Box sx={{ display: 'flex' }}>
+        {!dense ? (
+          <Tooltip title='Enable compact table mode'>
+            <IconButton onClick={() => setDense(true)}>
+              <FormatAlignJustify />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title='Turn off compact table mode'>
+            <IconButton onClick={() => setDense(false)}>
+              <TableRows />
+            </IconButton>
+          </Tooltip>
+        )}
         {!isEdit ? (
           <Tooltip title='Enable editing mode'>
             <IconButton onClick={handleOnEdit}>
@@ -86,23 +110,15 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
             </IconButton>
           </Tooltip>
         )}
-        {selected.length > 0 ? (
-          <Tooltip title='Delete'>
-            <IconButton
-              onClick={() => {
-                handleDataRemove(rows, selected);
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title='Filter list'>
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
+        <Tooltip title='Delete'>
+          <IconButton
+            onClick={() => {
+              handleDataRemove(rows, selected);
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Toolbar>
   );

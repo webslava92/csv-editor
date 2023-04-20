@@ -1,10 +1,6 @@
 /* eslint-disable no-console */
 import React, { useState } from 'react';
 import { Box, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import dayjs from 'dayjs';
-import * as isBetween from 'dayjs/plugin/isBetween';
-
-dayjs.extend(isBetween as any);
 
 type Props = {
   data: any;

@@ -1,12 +1,20 @@
-import { Button } from '@mui/material';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { usePapaParse } from 'react-papaparse';
+import { CSVLink } from 'react-csv';
+import { Button, useTheme } from '@mui/material';
 
-export function JsonToCSV({ data }: any) {
+export function JsonToCSV({ data, fileName }: any) {
   const { jsonToCSV } = usePapaParse();
-  const csvData = jsonToCSV(data);
-  const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
+  const theme = useTheme();
 
-  return <Button href={url} variant='contained'>Save csv file</Button>;
+  const csvData = jsonToCSV(data);
+
+  return (
+    <Button variant='contained'>
+      <CSVLink data={csvData} filename={`${fileName.split('.')[0]}-final`} style={{ color: 'white', textDecoration: 'none' }}>
+        Save CSV
+      </CSVLink>
+    </Button>
+  );
 }

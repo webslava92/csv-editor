@@ -11,4 +11,5 @@ export type FileType = { target: { files: any } };
 export type UploadFileProps = {
   items: any;
   setItems: Function;
+  format: string;
 };
