@@ -20,9 +20,7 @@ const csvConfig = {
   // columns: null,
 };
 
-export function UploadFile({ items, setItems, format }: UploadFileProps) {
-  const [defaultData, setDefaultData] = useState<any>([]);
-  const [fileName, setFileName] = useState<string>('');
+export function UploadFile({ items, setItems, format, defaultData, setDefaultData, fileName, setFileName }: UploadFileProps) {
   const { CSVReader } = useCSVReader();
 
   const styles = {
@@ -111,7 +109,8 @@ export function UploadFile({ items, setItems, format }: UploadFileProps) {
           const resultWithId = results.data.map(
             (item: any, i: any = 0) => ({ ...item, id: i })
           );
-          setFileName(acceptedFile.name);
+          const name = acceptedFile.name ?? '';
+          setFileName(name);
           setItems(resultWithId);
           setDefaultData(resultWithId);
         }}

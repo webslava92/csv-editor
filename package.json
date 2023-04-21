@@ -39,6 +39,7 @@
     "dayjs": "^1.11.7",
     "electron-is-dev": "^2.0.0",
     "electron-squirrel-startup": "^1.0.0",
+    "final-form": "^4.20.9",
     "lodash.isequal": "^4.5.0",
     "lodash.omit": "^4.5.0",
     "lodash.throttle": "^4.1.1",

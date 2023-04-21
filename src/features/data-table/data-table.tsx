@@ -49,6 +49,8 @@ export function DataTable({ rows, setData, format }: FormProps) {
   const [paddingHeight, setPaddingHeight] = useState(0);
   const [filteredData, setFilteredData] = useState<any>([]);
 
+  console.log('filteredData', filteredData);
+
   useEffect(() => {
     setFilteredData(rows);
   }, [rows]);

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { usePapaParse } from 'react-papaparse';
@@ -12,7 +13,14 @@ export function JsonToCSV({ data, fileName }: any) {
 
   return (
     <Button variant='contained'>
-      <CSVLink data={csvData} filename={`${fileName.split('.')[0]}-final`} style={{ color: 'white', textDecoration: 'none' }}>
+      <CSVLink
+        data={csvData}
+        filename={`${fileName.split('.')[0]}-final`}
+        style={{
+          color: String(theme.palette.primary.contrastText),
+          textDecoration: 'none',
+        }}
+      >
         Save CSV
       </CSVLink>
     </Button>

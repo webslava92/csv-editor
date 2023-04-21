@@ -1,12 +1,16 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { isEmpty } from 'lodash';
 import { TextField, Button, Box, InputAdornment } from '@mui/material';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CalendarMonth } from '@mui/icons-material';
+import { Field, Form } from 'react-final-form';
+import { SubmitButton } from 'src/ui/submit-button';
+import { validateForm } from './validate-form';
+// import validate from 'validate.js';
 
 interface FormProps {
   data: Record<string, any>[];
@@ -15,110 +19,138 @@ interface FormProps {
 }
 
 export function AddingControl({ data, setData, format }: FormProps) {
-  const [formData, setFormData] = useState<Record<string, any>>({});
-  const [newData, setNewData] = useState<Record<string, any>[]>([]);
-
   const fieldOrder = data.length && Object.keys(data[0]);
 
-  const fields = data.length && Object.entries(data[0]).map((item: any) => ({
-    [item[0]]: !!(
-      dayjs(item[1]).isValid() &&
-      item[0] !== 'phone' &&
-      item[0] !== 'id'
-    ),
-  }));
-
-  useEffect(() => {
-    if (data.length && !isEmpty(newData)) {
-      setData([...data, newData[0]]);
-    }
-  }, [newData]);
-
-  const handleInputChange = (key: any, value: any) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [key]: String(value),
+  const fields =
+    data.length &&
+    Object.entries(data[0]).map((item: any) => ({
+      [item[0]]: !!(
+        dayjs(item[1]).isValid() &&
+        item[0] !== 'phone' &&
+        item[0] !== 'id'
+      ),
     }));
-  };
 
   const handleReset = () => {
-    setNewData([]);
-    setFormData({});
+    // setNewData([]);
   };
 
-  const handleSubmit = () => {
-    const dataWithId: Record<string, any> = {
-      ...formData,
-      id: data.length,
-    };
+  const onSubmit = (values: any) => {
     const orderedData =
       fieldOrder &&
       fieldOrder.reduce(
-        (acc, key: string) => ({ ...acc, [key]: dataWithId[key] }),
+        (acc, key: string) => ({ ...acc,
+          [key]: dayjs(values[key]).isValid() &&
+        key !== 'phone' &&
+        key !== 'id' ? dayjs(values[key]).format(format) : values[key] }),
         {}
       );
-    if (data.length) {
-      setNewData((prevData: any) => [...prevData, orderedData]);
-    }
-    setFormData({});
+    console.log('orderedData', orderedData);
+    setData([...data, orderedData]);
   };
 
+  const initialValues =
+    data.length &&
+    Object.fromEntries(
+      Object.entries(data[0]).map(([key, value]) => [
+        key,
+        // eslint-disable-next-line no-nested-ternary
+        dayjs(value).isValid() && key !== 'phone' && key !== 'id'
+          ? dayjs(value)
+          : key === 'id' ? data.length : '',
+      ])
+    );
+
+
+  const subscription = { submitting: true, pristine: true };
+
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-      {data.length && fields && fields.map((field: Record<string, any>) =>
-        (Object.entries(field)[0][1] ? (
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-            key={Object.entries(field)[0][0]}
-          >
-            <Box>
-              <DateTimePicker
-                label='Registration date'
-                format={format}
-                value={formData[Object.entries(field)[0][0]] || dayjs()}
-                onChange={handleInputChange}
-                slotProps={{
-                  textField: {
-                    InputProps: {
-                      endAdornment: (
-                        <InputAdornment position='end'>
-                          <CalendarMonth />
-                        </InputAdornment>
-                      ),
-                    },
-                    size: 'small',
-                  },
-                }}
-              />
+    <Form
+      onSubmit={onSubmit}
+      validate={validateForm}
+      initialValues={initialValues}
+      subscription={subscription}
+      render={({
+        handleSubmit,
+        submitting,
+        submitError,
+        form,
+        values,
+      }) => (
+        <form onSubmit={handleSubmit}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <>
+              {console.log('values', values)}
+              {data.length &&
+                fields &&
+                fields.map((field: Record<string, any>) =>
+                  (Object.entries(field)[0][1] ? (
+                    <Field
+                      key={Object.entries(field)[0][0]}
+                      name={Object.entries(field)[0][0]}
+                      render={({ input, meta }) => (
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <Box>
+                            <DateTimePicker
+                              {...input}
+                              label='Registration date'
+                              format={format}
+                              slotProps={{
+                                textField: {
+                                  InputProps: {
+                                    endAdornment: (
+                                      <InputAdornment position='end'>
+                                        <CalendarMonth />
+                                      </InputAdornment>
+                                    ),
+                                  },
+                                  size: 'small',
+                                },
+                              }}
+                            />
+                          </Box>
+                        </LocalizationProvider>
+                      )}
+                    />
+                  ) : (
+                    <Field
+                      key={Object.entries(field)[0][0]}
+                      name={Object.entries(field)[0][0]}
+                      render={({ input, meta }) => (
+                        <TextField
+                          {...input}
+                          label={Object.entries(field)[0][0]}
+                          disabled={Object.entries(field)[0][0] === 'id'}
+                          size='small'
+                          error={
+                            meta.touched &&
+                            (meta.error || meta.submitError)
+                          }
+                          helperText={
+                            meta.touched &&
+                            (meta.error || meta.submitError)
+                          }
+                        />
+                      )}
+                    />
+                  ))
+                )}
+            </>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Button onClick={handleReset} variant='contained'>
+                Reset
+              </Button>
+              <div>{submitError && <div>{submitError}</div>}</div>
+              <SubmitButton
+                submitting={submitting}
+                variant='contained'
+              >
+                Submit
+              </SubmitButton>
             </Box>
-          </LocalizationProvider>
-        ) : (
-          <TextField
-            key={Object.entries(field)[0][0]}
-            label={Object.entries(field)[0][0]}
-            disabled={Object.entries(field)[0][0] === 'id'}
-            value={
-              Object.entries(field)[0][0] === 'id'
-                ? data.length
-                : formData[Object.entries(field)[0][0]] || ''
-            }
-            onChange={(e) =>
-              handleInputChange(
-                Object.entries(field)[0][0],
-                e.target.value
-              )}
-            size='small'
-          />
-        ))
+          </Box>
+        </form>
       )}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-        <Button onClick={handleReset} variant='contained'>
-          Reset
-        </Button>
-        <Button onClick={handleSubmit} variant='contained'>
-          Submit
-        </Button>
-      </Box>
-    </Box>
+    />
   );
 }

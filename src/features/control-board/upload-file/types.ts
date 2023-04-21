@@ -12,4 +12,8 @@ export type UploadFileProps = {
   items: any;
   setItems: Function;
   format: string;
+  defaultData: any[];
+  setDefaultData: Function;
+  fileName: string;
+  setFileName: Function;
 };

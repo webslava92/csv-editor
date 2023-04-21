@@ -6,10 +6,12 @@ import { ControlBoard } from '@features/control-board';
 import './App.css';
 import { DataTable } from '@features/data-table/data-table';
 
-export function App({ theme, setTheme }: any) {
+export function App() {
   const [items, setItems] = useState<any>([]);
   const [format, setFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
-  const themeUse = useTheme();
+  const theme = useTheme();
+
+  console.log('items', items);
 
   const styles = {
     app: {
@@ -28,13 +30,13 @@ export function App({ theme, setTheme }: any) {
       width: '100%',
       margin: '0 auto',
       padding: '16px',
-      backgroundColor: themeUse.palette.primary.contrastText,
+      backgroundColor: theme.palette.primary.contrastText,
     },
     adress: {
       display: 'flex',
       fontSize: '0.9rem',
       fontWeight: 700,
-      color: themeUse.palette.primary.main,
+      color: theme.palette.primary.main,
       margin: '16px auto 0',
       textAlign: 'center',
       minHeight: '1.8rem',
@@ -44,11 +46,11 @@ export function App({ theme, setTheme }: any) {
       marginTop: '16px',
       marginBottom: '16px',
       '& .MuiInput-underline:after': {
-        color: themeUse.palette.primary.main,
+        color: theme.palette.primary.main,
       },
     },
     filesWrapper: {
-      backgroundColor: themeUse.palette.primary.contrastText,
+      backgroundColor: theme.palette.primary.contrastText,
       boxSizing: 'border-box',
     },
   };
@@ -64,8 +66,6 @@ export function App({ theme, setTheme }: any) {
               setData={setItems}
               format={format}
               setFormat={setFormat}
-              theme={theme}
-              setTheme={setTheme}
             />
             <DataTable rows={items} setData={setItems} format={format} />
           </Box>

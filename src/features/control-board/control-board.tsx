@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
-import { Box, IconButton, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
-import { WbSunny } from '@mui/icons-material';
+import { ThemeSelector } from '@common/theme-selector';
 import { PeriodControl } from './period-control';
 import { DuplicateControl } from './dublicate-control';
 import { UploadFile } from './upload-file';
-import { AddingControl } from './adding-control/adding-control';
+import { AddingControl } from './adding-control';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -42,12 +42,15 @@ function a11yProps(index: number) {
   };
 }
 
-export function ControlBoard({ data, setData, format, setFormat, theme, setTheme }: any) {
+export function ControlBoard({ data, setData, format, setFormat }: any) {
+  const [defaultData, setDefaultData] = useState<any>([]);
+  const [fileName, setFileName] = useState<string>('');
   const [fromValue, setFromValue] = useState<Dayjs | null>(dayjs());
   const [toValue, setToValue] = useState<Dayjs | null>(dayjs());
   const [error, setError] = useState<string>('');
   const [value, setValue] = useState(0);
 
+  console.log('defaultData', defaultData);
   const handleChangeTab = (
     event: React.SyntheticEvent,
     newValue: number
@@ -82,11 +85,7 @@ export function ControlBoard({ data, setData, format, setFormat, theme, setTheme
         <Typography variant='h5' sx={styles.title}>
           Controls
         </Typography>
-        <IconButton
-          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-        >
-          <WbSunny />
-        </IconButton>
+        <ThemeSelector />
       </Box>
       <Box sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -102,7 +101,15 @@ export function ControlBoard({ data, setData, format, setFormat, theme, setTheme
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
-          <UploadFile items={data} setItems={setData} format={format} />
+          <UploadFile
+            items={data}
+            setItems={setData}
+            defaultData={defaultData}
+            setDefaultData={setDefaultData}
+            format={format}
+            fileName={fileName}
+            setFileName={setFileName}
+          />
         </TabPanel>
         <TabPanel value={value} index={1}>
           <PeriodControl
