@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
-import React, { useState } from 'react';
+import React from 'react';
 import { useCSVReader } from 'react-papaparse';
+import iconv from 'iconv-lite';
 // import dayjs from 'dayjs';
 import { Box, Button, Typography } from '@mui/material';
 import dayjs from 'dayjs';
@@ -19,6 +18,23 @@ const csvConfig = {
   skipEmptyLines: true,
   // columns: null,
 };
+
+function convertToUtf8(data: any): any {
+  if (typeof data === 'string') {
+    return iconv.decode(Buffer.from(data), 'UTF-8');
+  }
+  if (typeof data === 'object') {
+    if (Array.isArray(data)) {
+      return data.map((item: any) => convertToUtf8(item));
+    }
+    const result: any = {};
+    for (const [key, value] of Object.entries(data)) {
+      result[key] = convertToUtf8(value);
+    }
+    return result;
+  }
+  return data;
+}
 
 export function UploadFile({ items, setItems, format, defaultData, setDefaultData, fileName, setFileName }: UploadFileProps) {
   const { CSVReader } = useCSVReader();
@@ -111,8 +127,8 @@ export function UploadFile({ items, setItems, format, defaultData, setDefaultDat
           );
           const name = acceptedFile.name ?? '';
           setFileName(name);
-          setItems(resultWithId);
-          setDefaultData(resultWithId);
+          setItems(convertToUtf8(resultWithId));
+          setDefaultData(convertToUtf8(resultWithId));
         }}
       >
         {({ getRootProps, ProgressBar, getRemoveFileProps }: any) => (

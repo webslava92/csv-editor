@@ -11,8 +11,6 @@ export function App() {
   const [format, setFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
   const theme = useTheme();
 
-  console.log('items', items);
-
   const styles = {
     app: {
       position: 'relative',

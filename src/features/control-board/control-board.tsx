@@ -7,6 +7,7 @@ import { PeriodControl } from './period-control';
 import { DuplicateControl } from './dublicate-control';
 import { UploadFile } from './upload-file';
 import { AddingControl } from './adding-control';
+import { FunnelControl } from './funnel-control';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,7 +51,6 @@ export function ControlBoard({ data, setData, format, setFormat }: any) {
   const [error, setError] = useState<string>('');
   const [value, setValue] = useState(0);
 
-  console.log('defaultData', defaultData);
   const handleChangeTab = (
     event: React.SyntheticEvent,
     newValue: number
@@ -97,7 +97,8 @@ export function ControlBoard({ data, setData, format, setFormat }: any) {
             <Tab label='File' {...a11yProps(0)} />
             <Tab label='Period' {...a11yProps(1)} />
             <Tab label='Duplicates' {...a11yProps(2)} />
-            <Tab label='Adding' {...a11yProps(3)} />
+            <Tab label='Add' {...a11yProps(3)} />
+            <Tab label='Funnels' {...a11yProps(3)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -129,6 +130,9 @@ export function ControlBoard({ data, setData, format, setFormat }: any) {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <AddingControl data={data} setData={setData} format={format} />
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          <FunnelControl data={data} setData={setData} />
         </TabPanel>
       </Box>
     </Paper>

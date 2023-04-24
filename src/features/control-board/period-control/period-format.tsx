@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import { Box, IconButton, TextField, Tooltip } from '@mui/material';
 import { Edit, EditOff } from '@mui/icons-material';

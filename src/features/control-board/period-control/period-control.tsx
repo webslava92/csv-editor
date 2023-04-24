@@ -1,5 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-console */
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import dayjs from 'dayjs';
@@ -47,6 +45,7 @@ export function PeriodControl({
         {},
         ...Object.entries(item).map(([key, val]: any) => ({
           [key]:
+            // eslint-disable-next-line no-nested-ternary
             dayjs(val).isValid() && key !== 'phone' && key !== 'id'
               ? dayjs(val).isBetween(fromValue, toValue)
                 ? val

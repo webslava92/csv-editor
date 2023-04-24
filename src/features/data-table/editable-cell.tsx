@@ -1,6 +1,3 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { Box, InputAdornment, TextField } from '@mui/material';
 import dayjs from 'dayjs';
@@ -47,7 +44,9 @@ export function EditableCell({
 
   const isEditable = selected.find((select: any) => select === rowId);
 
+  // eslint-disable-next-line no-nested-ternary
   return isEdit && (isEditable === 0 || isEditable) ? (
+    // eslint-disable-next-line no-nested-ternary
     dayjs(value as string).isValid() &&
     columnId !== 'phone' &&
     columnId !== 'id' ? (

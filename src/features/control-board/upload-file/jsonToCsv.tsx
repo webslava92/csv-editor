@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { usePapaParse } from 'react-papaparse';
 import { CSVLink } from 'react-csv';
@@ -20,6 +18,7 @@ export function JsonToCSV({ data, fileName }: any) {
           color: String(theme.palette.primary.contrastText),
           textDecoration: 'none',
         }}
+        uFEFF={false}
       >
         Save CSV
       </CSVLink>
