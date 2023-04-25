@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   ChangeEvent,
   MouseEvent,
@@ -33,9 +35,17 @@ interface FormProps {
   rows: Record<string, any>[];
   setData: Function;
   format: string;
+  utfError: boolean;
+  setUtfError: Function;
 }
 
-export function DataTable({ rows, setData, format }: FormProps) {
+export function DataTable({
+  rows,
+  setData,
+  format,
+  utfError,
+  setUtfError,
+}: FormProps) {
   const [order, setOrder] = useState<Order>(DEFAULT_ORDER);
   const [orderBy, setOrderBy] = useState<any>(DEFAULT_ORDER_BY);
   const [selected, setSelected] = useState<readonly string[]>([]);
@@ -46,6 +56,10 @@ export function DataTable({ rows, setData, format }: FormProps) {
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE);
   const [paddingHeight, setPaddingHeight] = useState(0);
   const [filteredData, setFilteredData] = useState<any>([]);
+
+  function filteredUTF(key: boolean) {
+    return rows.filter((item: any) => item.isUTF === key);
+  }
 
   useEffect(() => {
     setFilteredData(rows);
@@ -182,9 +196,17 @@ export function DataTable({ rows, setData, format }: FormProps) {
   const isSelected = (id: string) => selected.indexOf(id) !== -1;
 
   const handleCellChange = (value: any, rowId: any, columnId: any) => {
+    function checkNonAsciiCharacters(str: any): boolean {
+      const asciiValues = String(str)
+        .split('')
+        .map((char: string) => char.charCodeAt(0));
+      return asciiValues.some((val: any) => val > 127);
+    }
+
     setData((prevData: any) => {
       const newData = [...prevData];
       newData[rowId][columnId] = value;
+      newData[rowId].isUTF = checkNonAsciiCharacters(value);
       return newData;
     });
   };
@@ -196,6 +218,8 @@ export function DataTable({ rows, setData, format }: FormProps) {
           headers={headers}
           rows={rows}
           setFilteredData={setFilteredData}
+          utfError={utfError}
+          setUtfError={setUtfError}
         />
         <DataTableToolbar
           rows={filteredData}
@@ -206,6 +230,7 @@ export function DataTable({ rows, setData, format }: FormProps) {
           setSelected={setSelected}
           dense={dense}
           setDense={setDense}
+          setUtfError={setUtfError}
         />
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table
@@ -237,7 +262,9 @@ export function DataTable({ rows, setData, format }: FormProps) {
                       tabIndex={-1}
                       key={row.id}
                       selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
+                      sx={{
+                        backgroundColor: row.isUTF ? 'yellow' : 'unset',
+                      }}
                     >
                       <TableCell padding='checkbox'>
                         <Checkbox
@@ -269,7 +296,7 @@ export function DataTable({ rows, setData, format }: FormProps) {
                     </TableRow>
                   );
                 })
-                : null}
+                : ''}
               {paddingHeight > 0 && (
                 <TableRow
                   style={{

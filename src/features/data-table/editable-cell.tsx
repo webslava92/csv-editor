@@ -22,7 +22,8 @@ export function EditableCell({
   const isDate =
     dayjs(value as string).isValid() &&
     columnId !== 'phone' &&
-    columnId !== 'id';
+    columnId !== 'id' &&
+    columnId !== 'isUTF';
 
   const [dateTime, setDateTime] = useState<any>(dayjs());
 
@@ -44,59 +45,63 @@ export function EditableCell({
 
   const isEditable = selected.find((select: any) => select === rowId);
 
-  // eslint-disable-next-line no-nested-ternary
-  return isEdit && (isEditable === 0 || isEditable) ? (
-    // eslint-disable-next-line no-nested-ternary
-    dayjs(value as string).isValid() &&
-    columnId !== 'phone' &&
-    columnId !== 'id' ? (
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Box>
-          <DateTimePicker
-            label='Registration date'
-            format={format}
-            value={dayjs(value).utc() || dayjs()}
-            onChange={(val) => handleDateChange(val)}
-            slotProps={{
-              textField: {
-                InputProps: {
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <CalendarMonth />
-                    </InputAdornment>
-                  ),
+  if (isEdit && (isEditable || isEditable === 0)) {
+    if (
+      dayjs(value as string).isValid() &&
+      columnId !== 'phone' &&
+      columnId !== 'id' &&
+      columnId !== 'isUTF'
+    ) {
+      return (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Box>
+            <DateTimePicker
+              label='Registration date'
+              format={format}
+              value={dayjs(value).utc() || dayjs()}
+              onChange={(val) => handleDateChange(val)}
+              slotProps={{
+                textField: {
+                  InputProps: {
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <CalendarMonth />
+                      </InputAdornment>
+                    ),
+                  },
+                  size: 'small',
                 },
-                size: 'small',
-              },
-            }}
-          />
-        </Box>
-      </LocalizationProvider>
-      ) : columnId === 'id' ? (
-        <Box component='div'>
-          {value}
-        </Box>
-      ) : (
-        <TextField
-          value={value}
-          onChange={handleChange}
-          size='small'
-          inputProps={{
-            sx: {
-              padding: '3px 8px',
-              display: 'flex',
-              alignItems: 'center',
-              borderRadius: 'none',
-            },
-          }}
-          sx={{ borderRadius: 'none', width: '100%' }}
-        />
-      )
-  ) : (
+              }}
+            />
+          </Box>
+        </LocalizationProvider>
+      );
+    } if (columnId === 'id') {
+      return <Box component='div'>{value}</Box>;
+    } if (columnId === 'isUTF') {
+      return null;
+    } return (
+      <TextField
+        value={value}
+        onChange={handleChange}
+        size='small'
+        inputProps={{
+          sx: {
+            padding: '3px 8px',
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: 'none',
+          },
+        }}
+        sx={{ borderRadius: 'none', width: '100%' }}
+      />
+    );
+  } return (
     <Box component='div'>
       {dayjs(value as string).isValid() &&
       columnId !== 'phone' &&
-      columnId !== 'id'
+      columnId !== 'id' &&
+      columnId !== 'isUTF'
         ? dayjs(value as string)
           .utc()
           .format(format)

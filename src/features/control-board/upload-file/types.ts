@@ -16,4 +16,9 @@ export type UploadFileProps = {
   setDefaultData: Function;
   fileName: string;
   setFileName: Function;
+  delimiter: string;
+  setDelimiter: Function;
+  exportDelimiter: string;
+  setExportDelimiter: Function;
+  setUtfError: Function;
 };

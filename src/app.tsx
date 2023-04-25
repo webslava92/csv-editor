@@ -5,11 +5,15 @@ import { TopBar } from '@features/top-bar/top-bar';
 import { ControlBoard } from '@features/control-board';
 import './App.css';
 import { DataTable } from '@features/data-table/data-table';
+import InfoSnackbars from './ui/snack-bar';
 
 export function App() {
   const [items, setItems] = useState<any>([]);
   const [format, setFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
+  const [utfError, setUtfError] = useState<boolean>(false);
   const theme = useTheme();
+
+  console.log('utfError', utfError);
 
   const styles = {
     app: {
@@ -64,8 +68,16 @@ export function App() {
               setData={setItems}
               format={format}
               setFormat={setFormat}
+              setUtfError={setUtfError}
             />
-            <DataTable rows={items} setData={setItems} format={format} />
+            {items.length && <InfoSnackbars utfError={!!utfError} />}
+            <DataTable
+              rows={items}
+              setData={setItems}
+              format={format}
+              utfError={utfError}
+              setUtfError={setUtfError}
+            />
           </Box>
         </Box>
       </Box>

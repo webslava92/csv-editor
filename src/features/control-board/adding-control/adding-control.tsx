@@ -23,20 +23,22 @@ export function AddingControl({ data, setData, format }: FormProps) {
       [item[0]]: !!(
         dayjs(item[1]).isValid() &&
         item[0] !== 'phone' &&
-        item[0] !== 'id'
+        item[0] !== 'id' &&
+        item[0] !== 'isUTF'
       ),
     }));
 
   const onSubmit = (values: any) => {
-    // eslint-disable-next-line no-console
-    console.log('values', values);
     const orderedData =
       fieldOrder &&
       fieldOrder.reduce(
         (acc, key: string) => ({
           ...acc,
           [key]:
-            dayjs(values[key]).isValid() && key !== 'phone' && key !== 'id'
+            dayjs(values[key]).isValid() &&
+            key !== 'phone' &&
+            key !== 'id' &&
+            key !== 'isUTF'
               ? dayjs(values[key]).format(format)
               : values[key],
         }),
@@ -51,7 +53,10 @@ export function AddingControl({ data, setData, format }: FormProps) {
       Object.entries(data[0]).map(([key, value]) => [
         key,
         // eslint-disable-next-line no-nested-ternary
-        dayjs(value).isValid() && key !== 'phone' && key !== 'id'
+        dayjs(value).isValid() &&
+        key !== 'phone' &&
+        key !== 'id' &&
+        key !== 'isUTF'
           ? dayjs()
           : key === 'id'
             ? data.length

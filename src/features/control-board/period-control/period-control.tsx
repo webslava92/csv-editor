@@ -46,7 +46,10 @@ export function PeriodControl({
         ...Object.entries(item).map(([key, val]: any) => ({
           [key]:
             // eslint-disable-next-line no-nested-ternary
-            dayjs(val).isValid() && key !== 'phone' && key !== 'id'
+            dayjs(val).isValid() &&
+            key !== 'phone' &&
+            key !== 'id' &&
+            key !== 'isUTF'
               ? dayjs(val).isBetween(fromValue, toValue)
                 ? val
                 : randomDate(fromValue, toValue)

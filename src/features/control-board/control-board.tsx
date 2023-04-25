@@ -43,13 +43,21 @@ function a11yProps(index: number) {
   };
 }
 
-export function ControlBoard({ data, setData, format, setFormat }: any) {
+export function ControlBoard({
+  data,
+  setData,
+  format,
+  setFormat,
+  setUtfError,
+}: any) {
   const [defaultData, setDefaultData] = useState<any>([]);
   const [fileName, setFileName] = useState<string>('');
   const [fromValue, setFromValue] = useState<Dayjs | null>(dayjs());
   const [toValue, setToValue] = useState<Dayjs | null>(dayjs());
   const [error, setError] = useState<string>('');
   const [value, setValue] = useState(0);
+  const [delimiter, setDelimiter] = useState<string>(',');
+  const [exportDelimiter, setExportDelimiter] = useState<string>(',');
 
   const handleChangeTab = (
     event: React.SyntheticEvent,
@@ -110,6 +118,11 @@ export function ControlBoard({ data, setData, format, setFormat }: any) {
             format={format}
             fileName={fileName}
             setFileName={setFileName}
+            delimiter={delimiter}
+            setDelimiter={setDelimiter}
+            exportDelimiter={exportDelimiter}
+            setExportDelimiter={setExportDelimiter}
+            setUtfError={setUtfError}
           />
         </TabPanel>
         <TabPanel value={value} index={1}>

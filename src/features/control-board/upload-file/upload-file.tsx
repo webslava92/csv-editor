@@ -1,49 +1,51 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-console */
 import React from 'react';
 import { useCSVReader } from 'react-papaparse';
-import iconv from 'iconv-lite';
-// import dayjs from 'dayjs';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+import { DELIMITERS } from '@features/data-table/constants';
 import { UploadFileProps } from './types';
 import { JsonToCSV } from './jsonToCsv';
 
-const csvConfig = {
-  quotes: false,
-  // quoteChar: '"',
-  // escapeChar: '"',
-  delimiter: ',',
-  header: true,
-  // dynamicTyping: true,
-  // newline: '\r\n',
-  skipEmptyLines: true,
-  // columns: null,
-};
-
-function convertToUtf8(data: any): any {
-  if (typeof data === 'string') {
-    return iconv.decode(Buffer.from(data), 'UTF-8');
-  }
-  if (typeof data === 'object') {
-    if (Array.isArray(data)) {
-      return data.map((item: any) => convertToUtf8(item));
-    }
-    const result: any = {};
-    for (const [key, value] of Object.entries(data)) {
-      result[key] = convertToUtf8(value);
-    }
-    return result;
-  }
-  return data;
-}
-
-export function UploadFile({ items, setItems, format, defaultData, setDefaultData, fileName, setFileName }: UploadFileProps) {
+export function UploadFile({
+  items,
+  setItems,
+  format,
+  defaultData,
+  setDefaultData,
+  fileName,
+  setFileName,
+  delimiter,
+  setDelimiter,
+  exportDelimiter,
+  setExportDelimiter,
+  setUtfError,
+}: UploadFileProps) {
   const { CSVReader } = useCSVReader();
+
+  const csvConfig = {
+    quotes: false,
+    // quoteChar: '"',
+    // escapeChar: '"',
+    delimiter,
+    header: true,
+    // dynamicTyping: true,
+    // newline: '\r\n',
+    skipEmptyLines: true,
+    // columns: null,
+  };
 
   const styles = {
     wrapper: {
       marginTop: 2,
       marginBottom: 2,
     },
+    pickerBox: {
+      display: 'flex',
+      gap: 1,
+    },
+    selectControl: { minWidth: '75px' },
     title: {
       fontSize: { xs: '0.9rem', sm: '1rem', md: '1.4rem' },
       fontWeight: 700,
@@ -80,28 +82,45 @@ export function UploadFile({ items, setItems, format, defaultData, setDefaultDat
       display: 'flex',
       flexDirection: 'column',
       gap: 1,
+      width: '100%',
     },
     fileNameBox: {
       display: 'flex',
       gap: 1,
     },
     browseFile: {},
-    remove: {
-      marginLeft: 1,
+    resetBtnBox: {
+      textAlign: 'right',
+      marginTop: { xs: 2, md: 0 },
     },
+    resetBtn: {},
     progressBar: {
       display: 'flex',
       marginTop: 2,
       width: '100%',
     },
-    btnBox: {
+    addPickerBox: {
+      display: 'flex',
+      gap: 1,
+      justifyContent: { xs: 'space-between', md: 'left' },
+    },
+    savePickerBox: {
+      display: 'flex',
+      gap: 1,
       marginTop: { xs: 2, md: 0 },
+      justifyContent: { xs: 'space-between', md: 'left' },
+    },
+    btnBox: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      flexDirection: 'column',
     },
   };
 
   const dataWithoitId = items.map((item: any) => {
     const objCopy = { ...item };
     delete objCopy.id;
+    delete objCopy.isUTF;
     return objCopy;
   });
 
@@ -110,12 +129,26 @@ export function UploadFile({ items, setItems, format, defaultData, setDefaultDat
       {},
       ...Object.entries(item).map(([key, val]: any) => ({
         [key]:
-          dayjs(val).isValid() && key !== 'phone' && key !== 'id'
+          dayjs(val).isValid() &&
+          key !== 'phone' &&
+          key !== 'id' &&
+          key !== 'isUTF'
             ? dayjs(val).format(format)
             : val,
       }))
     )
   );
+
+  function checkNonAsciiCharacters(item: any): boolean {
+    const asciiValues = Object.values(item).map((str) =>
+      String(str)
+        .split('')
+        .map((char: string) => char.charCodeAt(0))
+    );
+    return asciiValues.some((val: number[]) =>
+      val.some((value: any) => value > 127)
+    );
+  }
 
   return (
     <Box sx={styles.wrapper}>
@@ -123,12 +156,20 @@ export function UploadFile({ items, setItems, format, defaultData, setDefaultDat
         config={csvConfig}
         onUploadAccepted={(results: any, acceptedFile: any) => {
           const resultWithId = results.data.map(
-            (item: any, i: any = 0) => ({ ...item, id: i })
+            (item: any, i: any = 0) => ({
+              ...item,
+              id: i,
+              isUTF: checkNonAsciiCharacters(item),
+            })
           );
-          const name = acceptedFile.name ?? '';
-          setFileName(name);
-          setItems(convertToUtf8(resultWithId));
-          setDefaultData(convertToUtf8(resultWithId));
+          if (results) {
+            setUtfError(
+              !!resultWithId.filter((i: any) => i.isUTF === true)
+            );
+          }
+          setFileName(acceptedFile.name ?? '');
+          setItems(resultWithId);
+          setDefaultData(resultWithId);
         }}
       >
         {({ getRootProps, ProgressBar, getRemoveFileProps }: any) => (
@@ -144,12 +185,38 @@ export function UploadFile({ items, setItems, format, defaultData, setDefaultDat
                       {fileName}
                     </Typography>
                   </Box>
-                  <Box>
+                  <Box sx={styles.addPickerBox}>
+                    <Box sx={styles.pickerBox}>
+                      <FormControl sx={styles.selectControl}>
+                        <InputLabel
+                          id='delimiter-filter-select-label'
+                          sx={{ display: 'flex', alignItems: 'center' }}
+                        >
+                          Delimiter
+                        </InputLabel>
+                        <Select
+                          labelId='delimiter-filter-select-label'
+                          id='delimiter-filter-select'
+                          value={delimiter}
+                          label='Delimiter'
+                          onChange={(e) => {
+                            setDelimiter(String(e.target.value));
+                          }}
+                          size='small'
+                        >
+                          {DELIMITERS.map((item: any) => (
+                            <MenuItem key={item} value={item}>
+                              {item}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
                     <Button
                       variant='contained'
                       type='button'
                       {...getRootProps()}
-                      style={styles.browseFile}
+                      sx={styles.browseFile}
                     >
                       Browse file
                     </Button>
@@ -157,15 +224,49 @@ export function UploadFile({ items, setItems, format, defaultData, setDefaultDat
                 </Box>
               </Box>
               <Box sx={styles.btnBox}>
-                <JsonToCSV data={newData} fileName={fileName} />
-                <Button
-                  variant='contained'
-                  sx={styles.remove}
-                  {...getRemoveFileProps()}
-                  onClick={() => setItems(defaultData)}
-                >
-                  Reset all
-                </Button>
+                <Box sx={styles.resetBtnBox}>
+                  <Button
+                    variant='contained'
+                    sx={styles.resetBtn}
+                    {...getRemoveFileProps()}
+                    onClick={() => setItems(defaultData)}
+                  >
+                    Reset all
+                  </Button>
+                </Box>
+                <Box sx={styles.savePickerBox}>
+                  <Box sx={styles.pickerBox}>
+                    <FormControl sx={styles.selectControl}>
+                      <InputLabel
+                        id='delimiter-filter-select-label'
+                        sx={{ display: 'flex', alignItems: 'center' }}
+                      >
+                        Delimiter
+                      </InputLabel>
+                      <Select
+                        labelId='delimiter-filter-select-label'
+                        id='delimiter-filter-select'
+                        value={exportDelimiter}
+                        label='Delimiter'
+                        onChange={(e) => {
+                          setExportDelimiter(String(e.target.value));
+                        }}
+                        size='small'
+                      >
+                        {DELIMITERS.map((item: any) => (
+                          <MenuItem key={item} value={item}>
+                            {item}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  <JsonToCSV
+                    data={newData}
+                    fileName={fileName}
+                    exportDelimiter={exportDelimiter}
+                  />
+                </Box>
               </Box>
             </Box>
             <ProgressBar style={styles.progressBar} />

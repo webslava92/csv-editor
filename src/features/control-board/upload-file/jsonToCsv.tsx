@@ -3,11 +3,11 @@ import { usePapaParse } from 'react-papaparse';
 import { CSVLink } from 'react-csv';
 import { Button, useTheme } from '@mui/material';
 
-export function JsonToCSV({ data, fileName }: any) {
+export function JsonToCSV({ data, fileName, exportDelimiter }: any) {
   const { jsonToCSV } = usePapaParse();
   const theme = useTheme();
 
-  const csvData = jsonToCSV(data);
+  const csvData = jsonToCSV(data, { delimiter: exportDelimiter });
 
   return (
     <Button variant='contained'>

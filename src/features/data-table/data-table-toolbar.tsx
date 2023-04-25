@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import {
   Box,
@@ -19,6 +20,7 @@ interface DataTableToolbarProps {
   setSelected: Function;
   dense: boolean;
   setDense: Function;
+  setUtfError: Function;
 }
 
 export function DataTableToolbar(props: DataTableToolbarProps) {
@@ -31,6 +33,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
     setSelected,
     dense,
     setDense,
+    setUtfError,
   } = props;
 
   const handleOnEdit = () => {
@@ -38,6 +41,9 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
   };
 
   const handleOffEdit = () => {
+    console.log('rows', rows);
+
+    setUtfError(!!rows.filter((i: any) => i.isUTF === true).length);
     setIsEdit(false);
     setSelected([]);
   };
@@ -104,7 +110,7 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
           </Tooltip>
         ) : (
           <Tooltip title='Turn off editing mode'>
-            <IconButton onClick={handleOffEdit}>
+            <IconButton onClick={handleOffEdit} color='error'>
               <EditOff />
             </IconButton>
           </Tooltip>
