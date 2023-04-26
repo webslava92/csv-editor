@@ -2,8 +2,10 @@
 /* eslint-disable no-console */
 import React from 'react';
 import { useCSVReader } from 'react-papaparse';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import dayjs from 'dayjs';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { checkNonAsciiCharacters } from '@common/checkNonUTF8Characters';
+import { dateToISO } from '@common/dateConverter';
 import { DELIMITERS } from '@features/data-table/constants';
 import { UploadFileProps } from './types';
 import { JsonToCSV } from './jsonToCsv';
@@ -129,26 +131,15 @@ export function UploadFile({
       {},
       ...Object.entries(item).map(([key, val]: any) => ({
         [key]:
-          dayjs(val).isValid() &&
+          dayjs(dateToISO(val, format)).isValid() &&
           key !== 'phone' &&
           key !== 'id' &&
           key !== 'isUTF'
-            ? dayjs(val).format(format)
+            ? dayjs(dateToISO(val, format)).utc().format(format)
             : val,
       }))
     )
   );
-
-  function checkNonAsciiCharacters(item: any): boolean {
-    const asciiValues = Object.values(item).map((str) =>
-      String(str)
-        .split('')
-        .map((char: string) => char.charCodeAt(0))
-    );
-    return asciiValues.some((val: number[]) =>
-      val.some((value: any) => value > 127)
-    );
-  }
 
   return (
     <Box sx={styles.wrapper}>
@@ -164,12 +155,27 @@ export function UploadFile({
           );
           if (results) {
             setUtfError(
-              !!resultWithId.filter((i: any) => i.isUTF === true)
+              !!resultWithId.filter((i: any) => i.isUTF === true).length
             );
           }
+          const newResult = resultWithId.map((item: any) =>
+            Object.assign(
+              {},
+              ...Object.entries(item).map(([key, val]: any) => ({
+                [key]:
+                  dayjs(dateToISO(val, format)).isValid() &&
+                  key !== 'phone' &&
+                  key !== 'id' &&
+                  key !== 'isUTF'
+                    ? dayjs(dateToISO(val, format)).utc().format(format)
+                    : val,
+              }))
+            )
+          );
+
           setFileName(acceptedFile.name ?? '');
-          setItems(resultWithId);
-          setDefaultData(resultWithId);
+          setItems(newResult);
+          setDefaultData(newResult);
         }}
       >
         {({ getRootProps, ProgressBar, getRemoveFileProps }: any) => (

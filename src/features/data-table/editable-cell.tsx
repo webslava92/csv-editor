@@ -6,6 +6,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CalendarMonth } from '@mui/icons-material';
+import { dateToISO } from '@common/dateConverter';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -20,7 +21,7 @@ export function EditableCell({
   selected,
 }: any) {
   const isDate =
-    dayjs(value as string).isValid() &&
+    dayjs(dateToISO(value as string, format)).isValid() &&
     columnId !== 'phone' &&
     columnId !== 'id' &&
     columnId !== 'isUTF';
@@ -47,7 +48,7 @@ export function EditableCell({
 
   if (isEdit && (isEditable || isEditable === 0)) {
     if (
-      dayjs(value as string).isValid() &&
+      dayjs(dateToISO(value as string, format)).isValid() &&
       columnId !== 'phone' &&
       columnId !== 'id' &&
       columnId !== 'isUTF'
@@ -58,7 +59,7 @@ export function EditableCell({
             <DateTimePicker
               label='Registration date'
               format={format}
-              value={dayjs(value).utc() || dayjs()}
+              value={dayjs(dateToISO(value, format)).utc() || dayjs()}
               onChange={(val) => handleDateChange(val)}
               slotProps={{
                 textField: {
@@ -98,12 +99,11 @@ export function EditableCell({
     );
   } return (
     <Box component='div'>
-      {dayjs(value as string).isValid() &&
+      {dayjs(dateToISO(value as string, format)).isValid() &&
       columnId !== 'phone' &&
       columnId !== 'id' &&
       columnId !== 'isUTF'
-        ? dayjs(value as string)
-          .utc()
+        ? dayjs(dateToISO(value as string, format))
           .format(format)
         : value}
     </Box>

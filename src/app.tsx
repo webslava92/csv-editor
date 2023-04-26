@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Paper, useTheme } from '@mui/material';
 import { TopBar } from '@features/top-bar/top-bar';
+import { dateToISO } from '@common/dateConverter';
 import { ControlBoard } from '@features/control-board';
 import './App.css';
 import { DataTable } from '@features/data-table/data-table';
@@ -11,9 +13,14 @@ export function App() {
   const [items, setItems] = useState<any>([]);
   const [format, setFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
   const [utfError, setUtfError] = useState<boolean>(false);
-  const theme = useTheme();
+  const [open, setOpen] = useState<boolean>(false);
 
-  console.log('utfError', utfError);
+  useEffect(() => {
+    if (items.length) {
+      setOpen(true);
+    }
+  }, [utfError, items]);
+  const theme = useTheme();
 
   const styles = {
     app: {
@@ -57,6 +64,8 @@ export function App() {
     },
   };
 
+  console.log('dateToISO', dateToISO('23-03-2023 15:55:12', format));
+
   return (
     <Paper sx={styles.app}>
       <TopBar />
@@ -70,7 +79,11 @@ export function App() {
               setFormat={setFormat}
               setUtfError={setUtfError}
             />
-            {items.length && <InfoSnackbars utfError={!!utfError} />}
+            <InfoSnackbars
+              utfError={utfError}
+              open={open}
+              setOpen={setOpen}
+            />
             <DataTable
               rows={items}
               setData={setItems}

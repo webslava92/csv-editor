@@ -41,8 +41,6 @@ export function DataTableToolbar(props: DataTableToolbarProps) {
   };
 
   const handleOffEdit = () => {
-    console.log('rows', rows);
-
     setUtfError(!!rows.filter((i: any) => i.isUTF === true).length);
     setIsEdit(false);
     setSelected([]);

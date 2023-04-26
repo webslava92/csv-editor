@@ -7,6 +7,7 @@ import React, {
   useState,
   useEffect,
 } from 'react';
+import dayjs from 'dayjs';
 import {
   Box,
   Table,
@@ -17,7 +18,11 @@ import {
   TableRow,
   Paper,
   Checkbox,
+  useTheme,
 } from '@mui/material';
+import { yellow } from '@mui/material/colors';
+import { checkNonUTF8Characters } from '@common/checkNonUTF8Characters';
+import { dateToISO } from '@common/dateConverter';
 import {
   DEFAULT_ORDER,
   DEFAULT_ORDER_BY,
@@ -56,10 +61,28 @@ export function DataTable({
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE);
   const [paddingHeight, setPaddingHeight] = useState(0);
   const [filteredData, setFilteredData] = useState<any>([]);
+  const theme = useTheme();
 
-  function filteredUTF(key: boolean) {
-    return rows.filter((item: any) => item.isUTF === key);
-  }
+  console.log('rows', rows);
+
+  useEffect(() => {
+    const data = rows.map((item: any) =>
+      Object.assign(
+        {},
+        ...Object.entries(item).map(([key, val]: any) => ({
+          [key]:
+            key !== 'phone' &&
+            key !== 'id' &&
+            key !== 'isUTF' &&
+            (dayjs(dateToISO(val, format)).isValid())
+              ? dayjs(dateToISO(val, format)).format(format)
+              : val,
+        }))
+      )
+    );
+    setData(data);
+    setFilteredData(data);
+  }, [format]);
 
   useEffect(() => {
     setFilteredData(rows);
@@ -68,6 +91,17 @@ export function DataTable({
   const headers = Array.from(
     new Set(rows.map((obj: any) => Object.keys(obj))[0])
   );
+
+  const fields =
+    rows.length &&
+    Object.entries(rows[0]).map((item: any) => ({
+      [item[0]]: !!(
+        dayjs(dateToISO(item[1], format)).isValid() &&
+        item[0] !== 'phone' &&
+        item[0] !== 'id' &&
+        item[0] !== 'isUTF'
+      ),
+    }));
 
   useEffect(() => {
     let rowsOnMount = stableSort(
@@ -196,30 +230,24 @@ export function DataTable({
   const isSelected = (id: string) => selected.indexOf(id) !== -1;
 
   const handleCellChange = (value: any, rowId: any, columnId: any) => {
-    function checkNonAsciiCharacters(str: any): boolean {
-      const asciiValues = String(str)
-        .split('')
-        .map((char: string) => char.charCodeAt(0));
-      return asciiValues.some((val: any) => val > 127);
-    }
-
     setData((prevData: any) => {
       const newData = [...prevData];
       newData[rowId][columnId] = value;
-      newData[rowId].isUTF = checkNonAsciiCharacters(value);
+      newData[rowId].isUTF = checkNonUTF8Characters(value);
       return newData;
     });
+    // setUtfError(!!rows.filter((i: any) => i.isUTF === true).length);
   };
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <Filters
-          headers={headers}
+          fields={fields}
           rows={rows}
           setFilteredData={setFilteredData}
           utfError={utfError}
-          setUtfError={setUtfError}
+          // format
         />
         <DataTableToolbar
           rows={filteredData}
@@ -263,7 +291,17 @@ export function DataTable({
                       key={row.id}
                       selected={isItemSelected}
                       sx={{
-                        backgroundColor: row.isUTF ? 'yellow' : 'unset',
+                        '&:hover': {
+                          backgroundColor: row.isUTF
+                            ? `${yellow[100]} !important`
+                            : 'unset',
+                        },
+                        '& .MuiCheckbox-root': {
+                          pointerEvents: 'auto',
+                        },
+                        backgroundColor: row.isUTF
+                          ? yellow[100]
+                          : 'unset',
                       }}
                     >
                       <TableCell padding='checkbox'>
@@ -274,13 +312,30 @@ export function DataTable({
                           inputProps={{
                             'aria-labelledby': labelId,
                           }}
+                          sx={{
+                            color:
+                                // eslint-disable-next-line no-nested-ternary
+                                theme.palette.mode !== 'dark'
+                                  ? 'rgba(0,0,0,0.6)'
+                                  : row.isUTF
+                                    ? 'rgba(0,0,0,0.87)'
+                                    : 'rgba(255,255,255,0.7)',
+                          }}
                         />
                       </TableCell>
                       {Object.entries(row).map((cellValue: any) => {
                         const [key, value] = cellValue;
 
                         return (
-                          <TableCell key={key} sx={{ padding: '2px' }}>
+                          <TableCell
+                            key={key}
+                            sx={{
+                              color: row.isUTF
+                                ? 'rgba(0,0,0,0.87)'
+                                : 'unset',
+                              padding: '2px',
+                            }}
+                          >
                             <EditableCell
                               value={value}
                               rowId={row.id}

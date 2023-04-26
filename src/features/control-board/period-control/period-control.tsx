@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button } from '@mui/material';
 import dayjs from 'dayjs';
 import * as isBetween from 'dayjs/plugin/isBetween';
+import { dateToISO } from '@common/dateConverter';
 import { PeriodPicker } from './period-picker';
 import { PeriodFormat } from './period-format';
 
@@ -46,11 +47,11 @@ export function PeriodControl({
         ...Object.entries(item).map(([key, val]: any) => ({
           [key]:
             // eslint-disable-next-line no-nested-ternary
-            dayjs(val).isValid() &&
+            dayjs(dateToISO(val, format)).isValid() &&
             key !== 'phone' &&
             key !== 'id' &&
             key !== 'isUTF'
-              ? dayjs(val).isBetween(fromValue, toValue)
+              ? dayjs(dateToISO(val, format)).isBetween(fromValue, toValue)
                 ? val
                 : randomDate(fromValue, toValue)
               : val,
@@ -91,6 +92,7 @@ export function PeriodControl({
           toValue={toValue}
           setToValue={setToValue}
           error={error}
+          format={format}
         />
         <PeriodFormat format={format} setFormat={setFormat} />
       </Box>

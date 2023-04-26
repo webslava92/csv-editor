@@ -145,7 +145,7 @@ export function ControlBoard({
           <AddingControl data={data} setData={setData} format={format} />
         </TabPanel>
         <TabPanel value={value} index={4}>
-          <FunnelControl data={data} setData={setData} />
+          <FunnelControl data={data} setData={setData} format={format} />
         </TabPanel>
       </Box>
     </Paper>

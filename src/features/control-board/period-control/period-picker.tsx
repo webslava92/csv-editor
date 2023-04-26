@@ -14,9 +14,17 @@ type Props = {
   toValue: any;
   setToValue: Function;
   error: string;
+  format: string;
 };
 
-export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, error }: Props) {
+export function PeriodPicker({
+  fromValue,
+  setFromValue,
+  toValue,
+  setToValue,
+  error,
+  format,
+}: Props) {
   const handleChangeFromValue = (newValue: Dayjs | null) => {
     setFromValue(newValue);
   };
@@ -68,13 +76,11 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
     <Box sx={styles.wrapper}>
       <Box component='div'>
         <Box sx={styles.periodBox}>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-          >
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={styles.pickerBox}>
               <DateTimePicker
                 label='Choose the initial period'
-                format='DD.MM.YYYY HH:mm:ss'
+                format={format}
                 value={fromValue}
                 onChange={handleChangeFromValue}
                 slotProps={{
@@ -99,13 +105,11 @@ export function PeriodPicker({ fromValue, setFromValue, toValue, setToValue, err
           >
             -
           </Typography>
-          <LocalizationProvider
-            dateAdapter={AdapterDayjs}
-          >
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={styles.pickerBox}>
               <DateTimePicker
                 label='Choose the end period'
-                format='DD.MM.YYYY HH:mm:ss'
+                format={format}
                 value={toValue}
                 onChange={handleChangeToValue}
                 slotProps={{

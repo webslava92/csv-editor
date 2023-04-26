@@ -1,10 +1,12 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
-import { TextField, Button, Box, InputAdornment } from '@mui/material';
+import { Field, Form } from 'react-final-form';
 import dayjs from 'dayjs';
+import { TextField, Button, Box, InputAdornment } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CalendarMonth } from '@mui/icons-material';
-import { Field, Form } from 'react-final-form';
+import { dateToISO } from '@common/dateConverter';
 import { SubmitButton } from 'src/ui/submit-button';
 import { validateForm } from './validate-form';
 
@@ -17,11 +19,19 @@ interface FormProps {
 export function AddingControl({ data, setData, format }: FormProps) {
   const fieldOrder = data.length && Object.keys(data[0]);
 
-  const fields =
+  const newData =
     data.length &&
-    Object.entries(data[0]).map((item: any) => ({
+    data.map((item: any) => {
+      const objCopy = { ...item };
+      delete objCopy.isUTF;
+      return objCopy;
+    });
+
+  const fields =
+    newData &&
+    Object.entries(newData[0]).map((item: any) => ({
       [item[0]]: !!(
-        dayjs(item[1]).isValid() &&
+        dayjs(dateToISO(item[1], format)).isValid() &&
         item[0] !== 'phone' &&
         item[0] !== 'id' &&
         item[0] !== 'isUTF'
@@ -35,11 +45,11 @@ export function AddingControl({ data, setData, format }: FormProps) {
         (acc, key: string) => ({
           ...acc,
           [key]:
-            dayjs(values[key]).isValid() &&
+            dayjs(dateToISO(values[key], format)).isValid() &&
             key !== 'phone' &&
             key !== 'id' &&
             key !== 'isUTF'
-              ? dayjs(values[key]).format(format)
+              ? dayjs(dateToISO(values[key], format)).format(format)
               : values[key],
         }),
         {}
@@ -52,8 +62,7 @@ export function AddingControl({ data, setData, format }: FormProps) {
     Object.fromEntries(
       Object.entries(data[0]).map(([key, value]) => [
         key,
-        // eslint-disable-next-line no-nested-ternary
-        dayjs(value).isValid() &&
+        dayjs(dateToISO(value, format)).isValid() &&
         key !== 'phone' &&
         key !== 'id' &&
         key !== 'isUTF'
@@ -82,64 +91,62 @@ export function AddingControl({ data, setData, format }: FormProps) {
       validate={validateForm}
       initialValues={initialValues}
       subscription={subscription}
-      render={({
-        handleSubmit,
-        submitting,
-        submitError,
-        form
-      }) => (
+      render={({ handleSubmit, submitting, submitError, form }) => (
         <form onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {data.length &&
               fields &&
-              fields.map((field: Record<string, any>) => (Object.entries(field)[0][1] ? (
-                <Field
-                  key={Object.entries(field)[0][0]}
-                  name={Object.entries(field)[0][0]}
-                  render={({ input }) => (
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <Box>
-                        <DateTimePicker
-                          {...input}
-                          label='Registration date'
-                          format={format}
-                          slotProps={{
-                            textField: {
-                              InputProps: {
-                                endAdornment: (
-                                  <InputAdornment position='end'>
-                                    <CalendarMonth />
-                                  </InputAdornment>
-                                ),
+              fields.map((field: Record<string, any>) =>
+                (Object.entries(field)[0][1] ? (
+                  <Field
+                    key={Object.entries(field)[0][0]}
+                    name={Object.entries(field)[0][0]}
+                    render={({ input }) => (
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <Box>
+                          <DateTimePicker
+                            {...input}
+                            label={Object.entries(field)[0][0]}
+                            format={format}
+                            slotProps={{
+                              textField: {
+                                InputProps: {
+                                  endAdornment: (
+                                    <InputAdornment position='end'>
+                                      <CalendarMonth />
+                                    </InputAdornment>
+                                  ),
+                                },
+                                size: 'small',
                               },
-                              size: 'small',
-                            },
-                          }}
-                        />
-                      </Box>
-                    </LocalizationProvider>
-                  )}
-                />
-              ) : (
-                <Field
-                  key={Object.entries(field)[0][0]}
-                  name={Object.entries(field)[0][0]}
-                  render={({ input, meta }) => (
-                    <TextField
-                      {...input}
-                      label={Object.entries(field)[0][0]}
-                      disabled={Object.entries(field)[0][0] === 'id'}
-                      size='small'
-                      error={
-                          meta.touched && (meta.error || meta.submitError)
-                        }
-                      helperText={
-                          meta.touched && (meta.error || meta.submitError)
-                        }
-                    />
-                  )}
-                />
-              )))}
+                            }}
+                          />
+                        </Box>
+                      </LocalizationProvider>
+                    )}
+                  />
+                ) : (
+                  <Field
+                    key={Object.entries(field)[0][0]}
+                    name={Object.entries(field)[0][0]}
+                    render={({ input, meta }) => (
+                      <TextField
+                        {...input}
+                        label={Object.entries(field)[0][0]}
+                        disabled={Object.entries(field)[0][0] === 'id'}
+                        size='small'
+                        error={
+                            meta.touched &&
+                            (meta.error || meta.submitError)
+                          }
+                        helperText={
+                            meta.touched &&
+                            (meta.error || meta.submitError)
+                          }
+                      />
+                    )}
+                  />
+                )))}
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               <Button
                 onClick={() => handleReset({ form })}
