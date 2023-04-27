@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
 import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
@@ -49,6 +48,8 @@ export function ControlBoard({
   format,
   setFormat,
   setUtfError,
+  uploadDateFormat,
+  setUploadDateFormat
 }: any) {
   const [defaultData, setDefaultData] = useState<any>([]);
   const [fileName, setFileName] = useState<string>('');
@@ -123,6 +124,8 @@ export function ControlBoard({
             exportDelimiter={exportDelimiter}
             setExportDelimiter={setExportDelimiter}
             setUtfError={setUtfError}
+            uploadDateFormat={uploadDateFormat}
+            setUploadDateFormat={setUploadDateFormat}
           />
         </TabPanel>
         <TabPanel value={value} index={1}>
@@ -145,7 +148,7 @@ export function ControlBoard({
           <AddingControl data={data} setData={setData} format={format} />
         </TabPanel>
         <TabPanel value={value} index={4}>
-          <FunnelControl data={data} setData={setData} format={format} />
+          <FunnelControl data={data} setData={setData} />
         </TabPanel>
       </Box>
     </Paper>

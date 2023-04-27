@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import { useCSVReader } from 'react-papaparse';
 import dayjs from 'dayjs';
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import { checkNonAsciiCharacters } from '@common/checkNonUTF8Characters';
-import { dateToISO } from '@common/dateConverter';
 import { DELIMITERS } from '@features/data-table/constants';
+import { dateToISO } from '@common/dateConverter';
 import { UploadFileProps } from './types';
 import { JsonToCSV } from './jsonToCsv';
+import { PeriodFormat } from '../period-control/period-format';
 
 export function UploadFile({
   items,
@@ -23,6 +23,8 @@ export function UploadFile({
   exportDelimiter,
   setExportDelimiter,
   setUtfError,
+  uploadDateFormat,
+  setUploadDateFormat
 }: UploadFileProps) {
   const { CSVReader } = useCSVReader();
 
@@ -131,11 +133,11 @@ export function UploadFile({
       {},
       ...Object.entries(item).map(([key, val]: any) => ({
         [key]:
-          dayjs(dateToISO(val, format)).isValid() &&
+          dayjs(val).isValid() &&
           key !== 'phone' &&
           key !== 'id' &&
           key !== 'isUTF'
-            ? dayjs(dateToISO(val, format)).utc().format(format)
+            ? dayjs(val).utc().format(format)
             : val,
       }))
     )
@@ -163,12 +165,14 @@ export function UploadFile({
               {},
               ...Object.entries(item).map(([key, val]: any) => ({
                 [key]:
-                  dayjs(dateToISO(val, format)).isValid() &&
+                  dayjs(val).isValid() &&
                   key !== 'phone' &&
                   key !== 'id' &&
                   key !== 'isUTF'
-                    ? dayjs(dateToISO(val, format)).utc().format(format)
-                    : val,
+                    ? dayjs(val).utc().toISOString()
+                    : dayjs(dateToISO(val, uploadDateFormat)).isValid()
+                      ? dateToISO(val, uploadDateFormat)
+                      : val,
               }))
             )
           );
@@ -218,6 +222,11 @@ export function UploadFile({
                         </Select>
                       </FormControl>
                     </Box>
+                    <PeriodFormat
+                      format={uploadDateFormat}
+                      setFormat={setUploadDateFormat}
+                      label={'Specific date format in the file'}
+                    />
                     <Button
                       variant='contained'
                       type='button'

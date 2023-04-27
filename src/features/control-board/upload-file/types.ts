@@ -21,4 +21,6 @@ export type UploadFileProps = {
   exportDelimiter: string;
   setExportDelimiter: Function;
   setUtfError: Function;
+  uploadDateFormat: string;
+  setUploadDateFormat: Function;
 };

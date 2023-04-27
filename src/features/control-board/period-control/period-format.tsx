@@ -5,18 +5,27 @@ import { Edit, EditOff } from '@mui/icons-material';
 interface PeriodProps {
   format: string;
   setFormat: Function;
+  label: string;
 }
 
-export function PeriodFormat({ format, setFormat }: PeriodProps) {
+export function PeriodFormat({ format, setFormat, label }: PeriodProps) {
   const [isEdit, setIsEdit] = useState(false);
+  const [change, setChange] = useState(format);
+
   const handleChange = (event: { target: { value: any } }) => {
-    setFormat(event.target.value);
+    setChange(event.target.value);
+  };
+
+  const handleClick = () => {
+    setIsEdit(!isEdit);
+    setFormat(change);
   };
 
   return (
     <Box sx={{ display: 'flex', gap: 1 }}>
       <TextField
-        value={format}
+        label={label}
+        value={change}
         onChange={handleChange}
         size='small'
         disabled={!isEdit}
@@ -29,7 +38,7 @@ export function PeriodFormat({ format, setFormat }: PeriodProps) {
         }}
         sx={{ borderRadius: 'none', width: '100%' }}
       />
-      <IconButton onClick={() => setIsEdit(!isEdit)}>
+      <IconButton onClick={handleClick}>
         {!isEdit ? (
           <Tooltip title='Enable format editing mode'>
             <Edit />

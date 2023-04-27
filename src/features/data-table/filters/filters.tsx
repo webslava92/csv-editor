@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
   FormControl,
-  InputAdornment,
+  // InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -23,8 +21,6 @@ export function Filters({
   fields,
   rows,
   setFilteredData,
-  utfError,
-  // format,
 }: any) {
   const [filters, setFilters] = useState<any>({});
   const isFilters = isEmpty(filters);
@@ -47,26 +43,30 @@ export function Filters({
 
   const handleFilterChange = (
     event: { target: { value: any } },
-    key: string | number
+    key: string | number,
+    isDate: boolean
   ) => {
     const newFilters = { ...filters };
     newFilters[key] =
+      // eslint-disable-next-line no-nested-ternary
       key === 'isUTF' && event.target.value === 'All'
         ? ''
-        : event.target.value;
+        : isDate
+          ? event.target.value
+          : event.target.value;
     setFilters(newFilters);
   };
 
-  useEffect(() => {
-    const newFilters = { ...filters };
-    if (utfError) {
-      newFilters.isUTF = 'true';
-      setFilters(newFilters);
-    } else {
-      newFilters.isUTF = '';
-      setFilters(newFilters);
-    }
-  }, [utfError, rows]);
+  // useEffect(() => {
+  //   const newFilters = { ...filters };
+  //   if (utfError) {
+  //     newFilters.isUTF = 'true';
+  //     setFilters(newFilters);
+  //   } else {
+  //     newFilters.isUTF = '';
+  //     setFilters(newFilters);
+  //   }
+  // }, [utfError, rows]);
 
   const clearFilters = () => {
     setFilters({});
@@ -89,18 +89,19 @@ export function Filters({
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
         {fields &&
           fields.map((field: Record<string, any>) => {
+            const key = Object.entries(field)[0][0];
+            const isDate = Object.entries(field)[0][1];
             if (
-              // !Object.entries(field)[0][1] &&
-              Object.entries(field)[0][0] !== 'isUTF'
+              key !== 'isUTF'
             ) {
               return (
                 <TextField
-                  key={Object.entries(field)[0][0]}
-                  label={Object.entries(field)[0][0]}
-                  name={Object.entries(field)[0][0]}
-                  value={filters[Object.entries(field)[0][0]] || ''}
+                  key={key}
+                  label={key}
+                  name={key}
+                  value={filters[key] || ''}
                   onChange={(event) =>
-                    handleFilterChange(event, Object.entries(field)[0][0])}
+                    handleFilterChange(event, key, isDate)}
                   variant='outlined'
                   style={{ marginRight: 10 }}
                   size='small'
@@ -108,25 +109,16 @@ export function Filters({
                 />
               );
             }
-            // if (Object.entries(field)[0][1]) {
+            // if (isDate) {
             // return (
             // eslint-disable-next-line react/jsx-no-undef
-            // <LocalizationProvider
-            //   dateAdapter={AdapterDayjs}
-            //   key={Object.entries(field)[0][0]}
-            // >
+            // <LocalizationProvider dateAdapter={AdapterDayjs} key={key}>
             //   <Box>
             //     <DateTimePicker
-            //       label={Object.entries(field)[0][0]}
+            //       label={key}
             //       format={format}
-            //       value={
-            //         filters[Object.entries(field)[0][0]] || dayjs().format(format)
-            //       }
-            //       onChange={(event) =>
-            //         handleFilterChange(
-            //           event,
-            //           Object.entries(field)[0][0]
-            //         )}
+            //       value={dayjs(filters[key]) || dayjs().format(format)}
+            //       onChange={(event) => handleFilterChange(event, key)}
             //       slotProps={{
             //         textField: {
             //           InputProps: {
@@ -145,7 +137,7 @@ export function Filters({
             // );
             // }
             return (
-              <Box sx={styles.pickerBox} key={Object.entries(field)[0][0]}>
+              <Box sx={styles.pickerBox} key={key}>
                 <FormControl sx={styles.selectControl}>
                   <InputLabel
                     id='UTF-8-filter-select-label'
@@ -156,16 +148,17 @@ export function Filters({
                   <Select
                     labelId='UTF-8-filter-select-label'
                     id='UTF-8-filter-select'
-                    value={filters[Object.entries(field)[0][0]] || 'All'}
+                    value={filters[key] || 'All'}
                     label='Charset'
                     onChange={(event) =>
                       handleFilterChange(
                         event,
-                        Object.entries(field)[0][0]
+                        key,
+                        isDate
                       )}
                     size='small'
                     sx={{
-                      backgroundColor: filters[Object.entries(field)[0][0]]
+                      backgroundColor: filters[key]
                         ? theme.palette.error.light
                         : 'transparent',
                     }}

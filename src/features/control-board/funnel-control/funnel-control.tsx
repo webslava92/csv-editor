@@ -13,12 +13,10 @@ import {
 } from '@mui/material';
 import { Edit, EditOff } from '@mui/icons-material';
 import dayjs from 'dayjs';
-import { dateToISO } from '@common/dateConverter';
 
 type Props = {
   data: any;
   setData: Function;
-  format: string;
 };
 
 const filters = [
@@ -44,7 +42,7 @@ const filters = [
   },
 ];
 
-export function FunnelControl({ data, setData, format }: Props) {
+export function FunnelControl({ data, setData }: Props) {
   const [key, setKey] = useState<string>('');
   const [funnelKey, setFunnelKey] = useState<string>('funnel');
   const [currentFunnels, setCurrentFunnels] = useState<string>('');
@@ -89,7 +87,7 @@ export function FunnelControl({ data, setData, format }: Props) {
         ...Object.entries(item).map(([k, v]: any) => ({
           [k]:
             (String(v).includes('.') && k === funnelKey) ||
-            (k === funnelKey && dayjs(dateToISO(v, format)).isValid())
+            (k === funnelKey && dayjs(v).isValid())
               ? arr[randomFunnel(arr)]
               : v,
         }))

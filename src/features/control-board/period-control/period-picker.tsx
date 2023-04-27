@@ -1,11 +1,11 @@
 import React from 'react';
+import dayjs, { Dayjs } from 'dayjs';
 import { Box, InputAdornment, Typography } from '@mui/material';
 import {
   DateTimePicker,
   LocalizationProvider,
 } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Dayjs } from 'dayjs';
 import { CalendarMonth } from '@mui/icons-material';
 
 type Props = {
@@ -81,7 +81,7 @@ export function PeriodPicker({
               <DateTimePicker
                 label='Choose the initial period'
                 format={format}
-                value={fromValue}
+                value={dayjs(fromValue, format)}
                 onChange={handleChangeFromValue}
                 slotProps={{
                   textField: {
@@ -110,7 +110,7 @@ export function PeriodPicker({
               <DateTimePicker
                 label='Choose the end period'
                 format={format}
-                value={toValue}
+                value={dayjs(toValue)}
                 onChange={handleChangeToValue}
                 slotProps={{
                   textField: {

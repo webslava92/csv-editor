@@ -6,7 +6,6 @@ import { TextField, Button, Box, InputAdornment } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CalendarMonth } from '@mui/icons-material';
-import { dateToISO } from '@common/dateConverter';
 import { SubmitButton } from 'src/ui/submit-button';
 import { validateForm } from './validate-form';
 
@@ -31,49 +30,28 @@ export function AddingControl({ data, setData, format }: FormProps) {
     newData &&
     Object.entries(newData[0]).map((item: any) => ({
       [item[0]]: !!(
-        dayjs(dateToISO(item[1], format)).isValid() &&
+        dayjs(item[1]).isValid() &&
         item[0] !== 'phone' &&
         item[0] !== 'id' &&
         item[0] !== 'isUTF'
       ),
     }));
 
-  const onSubmit = (values: any) => {
-    const orderedData =
-      fieldOrder &&
-      fieldOrder.reduce(
-        (acc, key: string) => ({
-          ...acc,
-          [key]:
-            dayjs(dateToISO(values[key], format)).isValid() &&
-            key !== 'phone' &&
-            key !== 'id' &&
-            key !== 'isUTF'
-              ? dayjs(dateToISO(values[key], format)).format(format)
-              : values[key],
-        }),
-        {}
-      );
-    setData([...data, orderedData]);
-  };
-
   const initialValues =
     data.length &&
     Object.fromEntries(
       Object.entries(data[0]).map(([key, value]) => [
         key,
-        dayjs(dateToISO(value, format)).isValid() &&
         key !== 'phone' &&
         key !== 'id' &&
-        key !== 'isUTF'
+        key !== 'isUTF' &&
+        dayjs(value).isValid()
           ? dayjs()
           : key === 'id'
             ? data.length
-            : '',
+            : key === 'isUTF' ? 'false' : '',
       ])
     );
-
-  const subscription = { submitting: true, pristine: true };
 
   const handleReset = ({ form }: any) => {
     if (fields) {
@@ -84,6 +62,28 @@ export function AddingControl({ data, setData, format }: FormProps) {
 
     form.reset(initialValues);
   };
+
+  const onSubmit = (values: any, form: any) => {
+    const orderedData =
+      fieldOrder &&
+      fieldOrder.reduce(
+        (acc, key: string) => ({
+          ...acc,
+          [key]:
+            dayjs(values[key]).isValid() &&
+            key !== 'phone' &&
+            key !== 'id' &&
+            key !== 'isUTF'
+              ? dayjs(values[key]).format(format)
+              : values[key],
+        }),
+        {}
+      );
+    setData([...data, orderedData]);
+    handleReset({ form });
+  };
+
+  const subscription = { submitting: true, pristine: true };
 
   return (
     <Form
@@ -96,57 +96,63 @@ export function AddingControl({ data, setData, format }: FormProps) {
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {data.length &&
               fields &&
-              fields.map((field: Record<string, any>) =>
-                (Object.entries(field)[0][1] ? (
-                  <Field
-                    key={Object.entries(field)[0][0]}
-                    name={Object.entries(field)[0][0]}
-                    render={({ input }) => (
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box>
-                          <DateTimePicker
-                            {...input}
-                            label={Object.entries(field)[0][0]}
-                            format={format}
-                            slotProps={{
-                              textField: {
-                                InputProps: {
-                                  endAdornment: (
-                                    <InputAdornment position='end'>
-                                      <CalendarMonth />
-                                    </InputAdornment>
-                                  ),
+              fields.map((field: Record<string, any>) => {
+                const key = Object.entries(field)[0][0];
+                const isDate = Object.entries(field)[0][1];
+                if (isDate) {
+                  return (
+                    <Field
+                      key={key}
+                      name={key}
+                      render={({ input }) => (
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <Box>
+                            <DateTimePicker
+                              {...input}
+                              label={key}
+                              format={format}
+                              slotProps={{
+                                textField: {
+                                  InputProps: {
+                                    endAdornment: (
+                                      <InputAdornment position='end'>
+                                        <CalendarMonth />
+                                      </InputAdornment>
+                                    ),
+                                  },
+                                  size: 'small',
                                 },
-                                size: 'small',
-                              },
-                            }}
-                          />
-                        </Box>
-                      </LocalizationProvider>
-                    )}
-                  />
-                ) : (
+                              }}
+                            />
+                          </Box>
+                        </LocalizationProvider>
+                      )}
+                    />
+                  );
+                } return (
                   <Field
-                    key={Object.entries(field)[0][0]}
-                    name={Object.entries(field)[0][0]}
+                    key={key}
+                    name={key}
                     render={({ input, meta }) => (
                       <TextField
                         {...input}
-                        label={Object.entries(field)[0][0]}
-                        disabled={Object.entries(field)[0][0] === 'id'}
+                        label={key}
+                        disabled={key === 'id'}
                         size='small'
                         error={
-                            meta.touched &&
-                            (meta.error || meta.submitError)
-                          }
+                              meta.touched &&
+                              (meta.error || meta.submitError)
+                            }
                         helperText={
-                            meta.touched &&
-                            (meta.error || meta.submitError)
-                          }
+                              meta.touched &&
+                              (meta.error || meta.submitError)
+                            }
                       />
                     )}
                   />
-                )))}
+                );
+              }
+              )}
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               <Button
                 onClick={() => handleReset({ form })}

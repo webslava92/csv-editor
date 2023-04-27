@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react';
 import { Box, Paper, useTheme } from '@mui/material';
 import { TopBar } from '@features/top-bar/top-bar';
-import { dateToISO } from '@common/dateConverter';
 import { ControlBoard } from '@features/control-board';
 import './App.css';
 import { DataTable } from '@features/data-table/data-table';
@@ -12,6 +9,7 @@ import InfoSnackbars from './ui/snack-bar';
 export function App() {
   const [items, setItems] = useState<any>([]);
   const [format, setFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
+  const [uploadDateFormat, setUploadDateFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
   const [utfError, setUtfError] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
@@ -64,8 +62,6 @@ export function App() {
     },
   };
 
-  console.log('dateToISO', dateToISO('23-03-2023 15:55:12', format));
-
   return (
     <Paper sx={styles.app}>
       <TopBar />
@@ -78,6 +74,8 @@ export function App() {
               format={format}
               setFormat={setFormat}
               setUtfError={setUtfError}
+              uploadDateFormat={uploadDateFormat}
+              setUploadDateFormat={setUploadDateFormat}
             />
             <InfoSnackbars
               utfError={utfError}
@@ -88,7 +86,6 @@ export function App() {
               rows={items}
               setData={setItems}
               format={format}
-              utfError={utfError}
               setUtfError={setUtfError}
             />
           </Box>

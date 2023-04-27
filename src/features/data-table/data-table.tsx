@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {
   ChangeEvent,
   MouseEvent,
@@ -22,7 +20,6 @@ import {
 } from '@mui/material';
 import { yellow } from '@mui/material/colors';
 import { checkNonUTF8Characters } from '@common/checkNonUTF8Characters';
-import { dateToISO } from '@common/dateConverter';
 import {
   DEFAULT_ORDER,
   DEFAULT_ORDER_BY,
@@ -40,7 +37,6 @@ interface FormProps {
   rows: Record<string, any>[];
   setData: Function;
   format: string;
-  utfError: boolean;
   setUtfError: Function;
 }
 
@@ -48,7 +44,6 @@ export function DataTable({
   rows,
   setData,
   format,
-  utfError,
   setUtfError,
 }: FormProps) {
   const [order, setOrder] = useState<Order>(DEFAULT_ORDER);
@@ -63,26 +58,24 @@ export function DataTable({
   const [filteredData, setFilteredData] = useState<any>([]);
   const theme = useTheme();
 
-  console.log('rows', rows);
-
-  useEffect(() => {
-    const data = rows.map((item: any) =>
-      Object.assign(
-        {},
-        ...Object.entries(item).map(([key, val]: any) => ({
-          [key]:
-            key !== 'phone' &&
-            key !== 'id' &&
-            key !== 'isUTF' &&
-            (dayjs(dateToISO(val, format)).isValid())
-              ? dayjs(dateToISO(val, format)).format(format)
-              : val,
-        }))
-      )
-    );
-    setData(data);
-    setFilteredData(data);
-  }, [format]);
+  // useEffect(() => {
+  //   const data = rows.map((item: any) =>
+  //     Object.assign(
+  //       {},
+  //       ...Object.entries(item).map(([key, val]: any) => ({
+  //         [key]:
+  //           key !== 'phone' &&
+  //           key !== 'id' &&
+  //           key !== 'isUTF' &&
+  //           dayjs(val).isValid()
+  //             ? dayjs(val).toISOString()
+  //             : val,
+  //       }))
+  //     )
+  //   );
+  //   setData(data);
+  //   setFilteredData(data);
+  // }, [format]);
 
   useEffect(() => {
     setFilteredData(rows);
@@ -96,7 +89,7 @@ export function DataTable({
     rows.length &&
     Object.entries(rows[0]).map((item: any) => ({
       [item[0]]: !!(
-        dayjs(dateToISO(item[1], format)).isValid() &&
+        dayjs(item[1]).isValid() &&
         item[0] !== 'phone' &&
         item[0] !== 'id' &&
         item[0] !== 'isUTF'
@@ -246,8 +239,6 @@ export function DataTable({
           fields={fields}
           rows={rows}
           setFilteredData={setFilteredData}
-          utfError={utfError}
-          // format
         />
         <DataTableToolbar
           rows={filteredData}

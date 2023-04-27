@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, InputAdornment, TextField } from '@mui/material';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -6,7 +6,6 @@ import timezone from 'dayjs/plugin/timezone';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CalendarMonth } from '@mui/icons-material';
-import { dateToISO } from '@common/dateConverter';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -20,19 +19,7 @@ export function EditableCell({
   format,
   selected,
 }: any) {
-  const isDate =
-    dayjs(dateToISO(value as string, format)).isValid() &&
-    columnId !== 'phone' &&
-    columnId !== 'id' &&
-    columnId !== 'isUTF';
-
-  const [dateTime, setDateTime] = useState<any>(dayjs());
-
-  useEffect(() => {
-    if (isDate) {
-      setDateTime(dayjs(value).utc());
-    }
-  }, []);
+  const [dateTime, setDateTime] = useState<any>(dayjs(value).utc());
 
   const handleChange = (event?: { target: { value: any } }, val?: any) => {
     setDateTime(val);
@@ -48,7 +35,7 @@ export function EditableCell({
 
   if (isEdit && (isEditable || isEditable === 0)) {
     if (
-      dayjs(dateToISO(value as string, format)).isValid() &&
+      dayjs(value as string).isValid() &&
       columnId !== 'phone' &&
       columnId !== 'id' &&
       columnId !== 'isUTF'
@@ -59,7 +46,7 @@ export function EditableCell({
             <DateTimePicker
               label='Registration date'
               format={format}
-              value={dayjs(dateToISO(value, format)).utc() || dayjs()}
+              value={dayjs(value).utc() || dayjs()}
               onChange={(val) => handleDateChange(val)}
               slotProps={{
                 textField: {
@@ -99,11 +86,11 @@ export function EditableCell({
     );
   } return (
     <Box component='div'>
-      {dayjs(dateToISO(value as string, format)).isValid() &&
+      {dayjs(value as string).isValid() &&
       columnId !== 'phone' &&
       columnId !== 'id' &&
       columnId !== 'isUTF'
-        ? dayjs(dateToISO(value as string, format))
+        ? dayjs(value as string)
           .format(format)
         : value}
     </Box>

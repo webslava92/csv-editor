@@ -1,8 +1,8 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import dayjs from 'dayjs';
 import * as isBetween from 'dayjs/plugin/isBetween';
-import { dateToISO } from '@common/dateConverter';
 import { PeriodPicker } from './period-picker';
 import { PeriodFormat } from './period-format';
 
@@ -37,27 +37,37 @@ export function PeriodControl({
   };
 
   function randomDate(start: any, end: any) {
-    return new Date(start + Math.random() * (end - start));
+    return dayjs(new Date(start + Math.random() * (end - start))).toISOString();
+  }
+
+  function randomDepositDate(regDate: any) {
+    const randomMilliseconds =
+      Math.floor(Math.random() * 86400000) + 86400000;
+    return dayjs(regDate)
+      .add(randomMilliseconds, 'millisecond')
+      .toISOString();
   }
 
   const handleChangeDates = () => {
-    const newDate = data.map((item: any) =>
-      Object.assign(
+    const newDate = data.map((item: any) => {
+      const random = randomDate(fromValue, toValue);
+      return Object.assign(
         {},
         ...Object.entries(item).map(([key, val]: any) => ({
           [key]:
-            // eslint-disable-next-line no-nested-ternary
-            dayjs(dateToISO(val, format)).isValid() &&
+            dayjs(val).isValid() &&
             key !== 'phone' &&
             key !== 'id' &&
             key !== 'isUTF'
-              ? dayjs(dateToISO(val, format)).isBetween(fromValue, toValue)
+              ? dayjs(val).isBetween(fromValue, toValue)
                 ? val
-                : randomDate(fromValue, toValue)
+                : key === 'deposit_date'
+                  ? randomDepositDate(random)
+                  : random
               : val,
         }))
-      )
-    );
+      );
+    });
     setData(newDate);
   };
 
@@ -94,7 +104,11 @@ export function PeriodControl({
           error={error}
           format={format}
         />
-        <PeriodFormat format={format} setFormat={setFormat} />
+        <PeriodFormat
+          format={format}
+          setFormat={setFormat}
+          label={'Date format'}
+        />
       </Box>
       <Box sx={styles.btnBox}>
         <Box sx={styles.btnBox}>

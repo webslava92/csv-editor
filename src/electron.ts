@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable global-require */
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
