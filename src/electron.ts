@@ -2,14 +2,14 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import isDev from 'electron-is-dev';
-// import electronReload from 'electron-reload';
+import electronReload from 'electron-reload';
 
 let win: any;
 const ipc = ipcMain;
 
-// if (isDev) {
-//   electronReload(__dirname, {});
-// }
+if (isDev) {
+  electronReload(__dirname, {});
+}
 
 function createWindow() {
   win = new BrowserWindow({
