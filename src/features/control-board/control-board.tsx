@@ -49,7 +49,9 @@ export function ControlBoard({
   setFormat,
   setUtfError,
   uploadDateFormat,
-  setUploadDateFormat
+  setUploadDateFormat,
+  formats,
+  setFormats,
 }: any) {
   const [defaultData, setDefaultData] = useState<any>([]);
   const [fileName, setFileName] = useState<string>('');
@@ -71,7 +73,7 @@ export function ControlBoard({
     if (dayjs(toValue) >= dayjs(fromValue)) {
       setError('');
     } else setError('The value cannot be less than the value "from"');
-  }, [toValue]);
+  }, [fromValue, toValue]);
 
   const styles = {
     wrapper: {
@@ -126,6 +128,8 @@ export function ControlBoard({
             setUtfError={setUtfError}
             uploadDateFormat={uploadDateFormat}
             setUploadDateFormat={setUploadDateFormat}
+            formats={formats}
+            setFormats={setFormats}
           />
         </TabPanel>
         <TabPanel value={value} index={1}>
@@ -139,6 +143,8 @@ export function ControlBoard({
             setData={setData}
             format={format}
             setFormat={setFormat}
+            formats={formats}
+            setFormats={setFormats}
           />
         </TabPanel>
         <TabPanel value={value} index={2}>

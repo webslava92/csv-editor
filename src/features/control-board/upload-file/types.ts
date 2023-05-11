@@ -23,4 +23,6 @@ export type UploadFileProps = {
   setUtfError: Function;
   uploadDateFormat: string;
   setUploadDateFormat: Function;
+  formats: string;
+  setFormats: Function;
 };

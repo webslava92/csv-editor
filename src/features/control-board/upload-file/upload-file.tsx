@@ -2,7 +2,15 @@
 import React from 'react';
 import { useCSVReader } from 'react-papaparse';
 import dayjs from 'dayjs';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material';
 import { checkNonAsciiCharacters } from '@common/checkNonUTF8Characters';
 import { DELIMITERS } from '@features/data-table/constants';
 import { dateToISO } from '@common/dateConverter';
@@ -24,7 +32,9 @@ export function UploadFile({
   setExportDelimiter,
   setUtfError,
   uploadDateFormat,
-  setUploadDateFormat
+  setUploadDateFormat,
+  formats,
+  setFormats,
 }: UploadFileProps) {
   const { CSVReader } = useCSVReader();
 
@@ -172,7 +182,15 @@ export function UploadFile({
                     ? dayjs(val).utc().toISOString()
                     : dayjs(dateToISO(val, uploadDateFormat)).isValid()
                       ? dateToISO(val, uploadDateFormat)
-                      : val,
+                      : dayjs(dateToISO(val, 'YYYY-MM-DD')).isValid()
+                        ? dateToISO(val, 'YYYY-MM-DD')
+                        : dayjs(dateToISO(val, 'YYYY-DD-MM')).isValid()
+                          ? dateToISO(val, 'YYYY-DD-MM')
+                          : dayjs(dateToISO(val, 'DD-MM-YYYY')).isValid()
+                            ? dateToISO(val, 'DD-MM-YYYY')
+                            : dayjs(dateToISO(val, 'MM-DD-YYYY')).isValid()
+                              ? dateToISO(val, 'MM-DD-YYYY')
+                              : val,
               }))
             )
           );
@@ -225,16 +243,20 @@ export function UploadFile({
                     <PeriodFormat
                       format={uploadDateFormat}
                       setFormat={setUploadDateFormat}
-                      label={'Specific date format in the file'}
+                      formats={formats}
+                      setFormats={setFormats}
+                      label={'Edit date format in the file'}
                     />
-                    <Button
-                      variant='contained'
-                      type='button'
-                      {...getRootProps()}
-                      sx={styles.browseFile}
-                    >
-                      Browse file
-                    </Button>
+                    <Box>
+                      <Button
+                        variant='contained'
+                        type='button'
+                        {...getRootProps()}
+                        sx={styles.browseFile}
+                      >
+                        Browse file
+                      </Button>
+                    </Box>
                   </Box>
                 </Box>
               </Box>

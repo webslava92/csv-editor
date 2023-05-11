@@ -8,8 +8,14 @@ import InfoSnackbars from './ui/snack-bar';
 
 export function App() {
   const [items, setItems] = useState<any>([]);
-  const [format, setFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
-  const [uploadDateFormat, setUploadDateFormat] = useState<string>('DD-MM-YYYY HH:mm:ss');
+  const [formats, setFormats] = useState<string>(
+    // eslint-disable-next-line max-len
+    'YYYY-MM-DD HH:mm:ss, MM-DD-YYYY HH:mm:ss, YYYY.MM.DD HH:mm:ss, MM.DD.YYYY HH:mm:ss, YYYY-MM-DD, MM-DD-YYYY, YYYY.MM.DD, MM.DD.YYYY'
+  );
+  const [format, setFormat] = useState<string>(formats.split(', ')[0]);
+  const [uploadDateFormat, setUploadDateFormat] = useState<string>(
+    formats.split(', ')[0]
+  );
   const [utfError, setUtfError] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
 
@@ -73,6 +79,8 @@ export function App() {
               setData={setItems}
               format={format}
               setFormat={setFormat}
+              formats={formats}
+              setFormats={setFormats}
               setUtfError={setUtfError}
               uploadDateFormat={uploadDateFormat}
               setUploadDateFormat={setUploadDateFormat}

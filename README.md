@@ -20,6 +20,10 @@ The page will reload when you make changes.
 
 To build a ready-made application for Windows (under Windows system)
 
+### `yarn build-linux`
+
+To build a ready-made application for Linux (under Linux system)
+
 ## Application for Linux (under Windows)
 
 ### `docker pull electronuserland/builder`

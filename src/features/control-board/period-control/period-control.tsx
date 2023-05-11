@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import { Box, Button } from '@mui/material';
@@ -18,6 +19,8 @@ type Props = {
   setData: Function;
   format: string;
   setFormat: Function;
+  formats: string;
+  setFormats: Function;
 };
 
 export function PeriodControl({
@@ -30,6 +33,8 @@ export function PeriodControl({
   setData,
   format,
   setFormat,
+  formats,
+  setFormats
 }: Props) {
   const handleResetDates = () => {
     setFromValue(dayjs());
@@ -37,7 +42,40 @@ export function PeriodControl({
   };
 
   function randomDate(start: any, end: any) {
-    return dayjs(new Date(start + Math.random() * (end - start))).toISOString();
+    const startOfDay = start.startOf('day');
+    const endOfDay = end.endOf('day');
+    const diffSeconds = endOfDay.diff(startOfDay, 'second');
+
+    const randomSeconds = Math.floor(Math.random() * diffSeconds);
+    const newDate = startOfDay.add(randomSeconds, 'second');
+
+    const startOfRange = newDate
+      .set('hour', start.hour())
+      .set('minute', start.minute())
+      .set('second', start.second());
+    const endOfRange = newDate
+      .set('hour', end.hour())
+      .set('minute', end.minute())
+      .set('second', end.second());
+
+    const isYesterday = endOfRange < startOfRange;
+
+    // Calculate the difference in seconds between the start of the range and the end of the range
+    const diffSecondsInRange = isYesterday
+      ? startOfRange.diff(endOfRange, 'second')
+      : endOfRange.diff(startOfRange, 'second');
+
+    // Calculate a random number of seconds within the range
+    const randomSecondsInRange = Math.floor(
+      Math.random() * diffSecondsInRange
+    );
+
+    // Add the random number of seconds to the start of the range to get the new date and time
+    const newRandomDate = startOfRange
+      .add(randomSecondsInRange, 'second')
+      .toISOString();
+
+    return newRandomDate;
   }
 
   function randomDepositDate(regDate: any) {
@@ -104,31 +142,39 @@ export function PeriodControl({
           error={error}
           format={format}
         />
-        <PeriodFormat
-          format={format}
-          setFormat={setFormat}
-          label={'Date format'}
-        />
+        <Box>
+          <Box sx={{ display: 'block' }}>
+            <PeriodFormat
+              format={format}
+              setFormat={setFormat}
+              formats={formats}
+              setFormats={setFormats}
+              label={'Edit date format'}
+            />
+          </Box>
+        </Box>
       </Box>
-      <Box sx={styles.btnBox}>
+      <Box>
         <Box sx={styles.btnBox}>
+          <Box sx={styles.btnBox}>
+            <Button
+              variant='contained'
+              disabled={isDisabled}
+              onClick={handleResetDates}
+              sx={styles.btn}
+            >
+              Reset Dates
+            </Button>
+          </Box>
           <Button
             variant='contained'
             disabled={isDisabled}
-            onClick={handleResetDates}
+            onClick={handleChangeDates}
             sx={styles.btn}
           >
-            Reset Dates
+            Change Dates
           </Button>
         </Box>
-        <Button
-          variant='contained'
-          disabled={isDisabled}
-          onClick={handleChangeDates}
-          sx={styles.btn}
-        >
-          Change Dates
-        </Button>
       </Box>
     </Box>
   );
