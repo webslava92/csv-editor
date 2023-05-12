@@ -8,7 +8,7 @@ export function dateToISO(date: string, format: string) {
       throw new Error('Invalid date format');
     }
 
-    const isoDateStr = parsedDate.utc().toISOString();
+    const isoDateStr = parsedDate.toISOString();
 
     return isoDateStr;
   }

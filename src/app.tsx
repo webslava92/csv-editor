@@ -10,7 +10,7 @@ export function App() {
   const [items, setItems] = useState<any>([]);
   const [formats, setFormats] = useState<string>(
     // eslint-disable-next-line max-len
-    'YYYY-MM-DD HH:mm:ss, MM-DD-YYYY HH:mm:ss, YYYY.MM.DD HH:mm:ss, MM.DD.YYYY HH:mm:ss, YYYY-MM-DD, MM-DD-YYYY, YYYY.MM.DD, MM.DD.YYYY'
+    'YYYY-MM-DD HH:mm:ss, YYYY-MM-DD HH:mm, YYYY-MM-DD, YYYY.DD.MM HH:mm:ss, YYYY.DD.MM HH:mm, YYYY.DD.MM, MM-DD-YYYY HH:mm:ss, MM-DD-YYYY HH:mm, MM-DD-YYYY, DD.MM.YYYY HH:mm:ss, DD.MM.YYYY HH:mm, DD.MM.YYYY'
   );
   const [format, setFormat] = useState<string>(formats.split(', ')[0]);
   const [uploadDateFormat, setUploadDateFormat] = useState<string>(

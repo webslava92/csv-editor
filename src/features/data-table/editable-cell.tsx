@@ -19,7 +19,7 @@ export function EditableCell({
   format,
   selected,
 }: any) {
-  const [dateTime, setDateTime] = useState<any>(dayjs(value).utc());
+  const [dateTime, setDateTime] = useState<any>(dayjs(value));
 
   const handleChange = (event?: { target: { value: any } }, val?: any) => {
     setDateTime(val);
@@ -46,7 +46,7 @@ export function EditableCell({
             <DateTimePicker
               label='Registration date'
               format={format}
-              value={dayjs(value).utc() || dayjs()}
+              value={dayjs(value) || dayjs()}
               onChange={(val) => handleDateChange(val)}
               slotProps={{
                 textField: {

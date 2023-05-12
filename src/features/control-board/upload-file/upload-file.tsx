@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-nested-ternary */
 import React from 'react';
 import { useCSVReader } from 'react-papaparse';
@@ -26,8 +27,8 @@ export function UploadFile({
   setDefaultData,
   fileName,
   setFileName,
-  delimiter,
-  setDelimiter,
+  // delimiter,
+  // setDelimiter,
   exportDelimiter,
   setExportDelimiter,
   setUtfError,
@@ -42,7 +43,7 @@ export function UploadFile({
     quotes: false,
     // quoteChar: '"',
     // escapeChar: '"',
-    delimiter,
+    // delimiter,
     header: true,
     // dynamicTyping: true,
     // newline: '\r\n',
@@ -138,17 +139,26 @@ export function UploadFile({
     return objCopy;
   });
 
+  const defaultTitles = [
+    'first_name',
+    'lastName',
+    'phone',
+    'email',
+    'country_id',
+    'language',
+    'funnel',
+    'id',
+    'isUTF',
+  ];
+
+  const isDate = (key: string) => !defaultTitles.includes(key);
+
   const newData = dataWithoitId.map((item: any) =>
     Object.assign(
       {},
       ...Object.entries(item).map(([key, val]: any) => ({
         [key]:
-          dayjs(val).isValid() &&
-          key !== 'phone' &&
-          key !== 'id' &&
-          key !== 'isUTF'
-            ? dayjs(val).utc().format(format)
-            : val,
+          dayjs(val).isValid() && isDate(key) ? dayjs(val).format(format) : val,
       }))
     )
   );
@@ -170,25 +180,54 @@ export function UploadFile({
               !!resultWithId.filter((i: any) => i.isUTF === true).length
             );
           }
+
+          // const dateFormats = [
+          //   'YYYY-MM-DD HH:mm:ss',
+          //   'YYYY-MM-DD HH:mm',
+          //   'YYYY-MM-DD',
+          //   'YYYY.DD.MM HH:mm:ss',
+          //   'YYYY.DD.MM HH:mm',
+          //   'YYYY.DD.MM',
+          //   'MM-DD-YYYY HH:mm:ss',
+          //   'MM-DD-YYYY HH:mm',
+          //   'MM-DD-YYYY',
+          //   'DD.MM.YYYY HH:mm:ss',
+          //   'DD.MM.YYYY HH:mm',
+          //   'DD.MM.YYYY'
+          // ];
+          // const isDDate = (val: string, form: string[]) => {
+          //   const checkList = form.map((item: string) => {
+          //     if (dayjs(dateToISO(val, item)).isValid()) {
+          //       return dayjs(dateToISO(val, item));
+          //     } return val;
+          //   });
+          //   // eslint-disable-next-line no-console
+          //   console.log('checkList', checkList);
+          // };
+
+          // isDDate('2023-03-31 19:24:34', dateFormats);
+
           const newResult = resultWithId.map((item: any) =>
             Object.assign(
               {},
               ...Object.entries(item).map(([key, val]: any) => ({
                 [key]:
-                  dayjs(val).isValid() &&
-                  key !== 'phone' &&
-                  key !== 'id' &&
-                  key !== 'isUTF'
-                    ? dayjs(val).utc().toISOString()
-                    : dayjs(dateToISO(val, uploadDateFormat)).isValid()
+                  dayjs(val).isValid() && isDate(key)
+                    ? dayjs.utc(val)
+                    : dayjs(dateToISO(val, uploadDateFormat)).isValid() &&
+                      isDate(key)
                       ? dateToISO(val, uploadDateFormat)
-                      : dayjs(dateToISO(val, 'YYYY-MM-DD')).isValid()
+                      : dayjs(dateToISO(val, 'YYYY-MM-DD')).isValid() &&
+                      isDate(key)
                         ? dateToISO(val, 'YYYY-MM-DD')
-                        : dayjs(dateToISO(val, 'YYYY-DD-MM')).isValid()
+                        : dayjs(dateToISO(val, 'YYYY-DD-MM')).isValid() &&
+                      isDate(key)
                           ? dateToISO(val, 'YYYY-DD-MM')
-                          : dayjs(dateToISO(val, 'DD-MM-YYYY')).isValid()
+                          : dayjs(dateToISO(val, 'DD-MM-YYYY')).isValid() &&
+                      isDate(key)
                             ? dateToISO(val, 'DD-MM-YYYY')
-                            : dayjs(dateToISO(val, 'MM-DD-YYYY')).isValid()
+                            : dayjs(dateToISO(val, 'MM-DD-YYYY')).isValid() &&
+                      isDate(key)
                               ? dateToISO(val, 'MM-DD-YYYY')
                               : val,
               }))
@@ -214,7 +253,7 @@ export function UploadFile({
                     </Typography>
                   </Box>
                   <Box sx={styles.addPickerBox}>
-                    <Box sx={styles.pickerBox}>
+                    {/* <Box sx={styles.pickerBox}>
                       <FormControl sx={styles.selectControl}>
                         <InputLabel
                           id='delimiter-filter-select-label'
@@ -239,7 +278,7 @@ export function UploadFile({
                           ))}
                         </Select>
                       </FormControl>
-                    </Box>
+                    </Box> */}
                     <PeriodFormat
                       format={uploadDateFormat}
                       setFormat={setUploadDateFormat}
