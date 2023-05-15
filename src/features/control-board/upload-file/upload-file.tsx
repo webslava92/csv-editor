@@ -181,32 +181,6 @@ export function UploadFile({
             );
           }
 
-          // const dateFormats = [
-          //   'YYYY-MM-DD HH:mm:ss',
-          //   'YYYY-MM-DD HH:mm',
-          //   'YYYY-MM-DD',
-          //   'YYYY.DD.MM HH:mm:ss',
-          //   'YYYY.DD.MM HH:mm',
-          //   'YYYY.DD.MM',
-          //   'MM-DD-YYYY HH:mm:ss',
-          //   'MM-DD-YYYY HH:mm',
-          //   'MM-DD-YYYY',
-          //   'DD.MM.YYYY HH:mm:ss',
-          //   'DD.MM.YYYY HH:mm',
-          //   'DD.MM.YYYY'
-          // ];
-          // const isDDate = (val: string, form: string[]) => {
-          //   const checkList = form.map((item: string) => {
-          //     if (dayjs(dateToISO(val, item)).isValid()) {
-          //       return dayjs(dateToISO(val, item));
-          //     } return val;
-          //   });
-          //   // eslint-disable-next-line no-console
-          //   console.log('checkList', checkList);
-          // };
-
-          // isDDate('2023-03-31 19:24:34', dateFormats);
-
           const newResult = resultWithId.map((item: any) =>
             Object.assign(
               {},
@@ -217,19 +191,55 @@ export function UploadFile({
                     : dayjs(dateToISO(val, uploadDateFormat)).isValid() &&
                       isDate(key)
                       ? dateToISO(val, uploadDateFormat)
-                      : dayjs(dateToISO(val, 'YYYY-MM-DD')).isValid() &&
-                      isDate(key)
-                        ? dateToISO(val, 'YYYY-MM-DD')
-                        : dayjs(dateToISO(val, 'YYYY-DD-MM')).isValid() &&
-                      isDate(key)
-                          ? dateToISO(val, 'YYYY-DD-MM')
-                          : dayjs(dateToISO(val, 'DD-MM-YYYY')).isValid() &&
-                      isDate(key)
-                            ? dateToISO(val, 'DD-MM-YYYY')
-                            : dayjs(dateToISO(val, 'MM-DD-YYYY')).isValid() &&
-                      isDate(key)
-                              ? dateToISO(val, 'MM-DD-YYYY')
-                              : val,
+                      : dayjs(
+                        dateToISO(val, 'YYYY-MM-DD HH:mm:ss')
+                      ).isValid() && isDate(key)
+                        ? dateToISO(val, 'YYYY-MM-DD HH:mm:ss')
+                        : dayjs(
+                          dateToISO(val, 'YYYY.DD.MM HH:mm:ss')
+                        ).isValid() && isDate(key)
+                          ? dateToISO(val, 'YYYY.DD.MM HH:mm:ss')
+                          : dayjs(
+                            dateToISO(val, 'MM-DD-YYYY HH:mm:ss')
+                          ).isValid() && isDate(key)
+                            ? dateToISO(val, 'MM-DD-YYYY HH:mm:ss')
+                            : dayjs(
+                              dateToISO(val, 'DD.MM.YYYY HH:mm:ss')
+                            ).isValid() && isDate(key)
+                              ? dateToISO(val, 'DD.MM.YYYY HH:mm:ss')
+                              : dayjs(
+                                dateToISO(val, 'YYYY-MM-DD HH:mm')
+                              ).isValid() && isDate(key)
+                                ? dateToISO(val, 'YYYY-MM-DD HH:mm')
+                                : dayjs(
+                                  dateToISO(val, 'YYYY.DD.MM HH:mm')
+                                ).isValid() && isDate(key)
+                                  ? dateToISO(val, 'YYYY.DD.MM HH:mm')
+                                  : dayjs(
+                                    dateToISO(val, 'MM-DD-YYYY HH:mm')
+                                  ).isValid() && isDate(key)
+                                    ? dateToISO(val, 'MM-DD-YYYY HH:mm')
+                                    : dayjs(
+                                      dateToISO(val, 'DD.MM.YYYY HH:mm')
+                                    ).isValid() && isDate(key)
+                                      ? dateToISO(val, 'DD.MM.YYYY HH:mm')
+                                      : dayjs(
+                                        dateToISO(val, 'YYYY-MM-DD')
+                                      ).isValid() && isDate(key)
+                                        ? dateToISO(val, 'YYYY-MM-DD')
+                                        : dayjs(
+                                          dateToISO(val, 'YYYY.DD.MM')
+                                        ).isValid() && isDate(key)
+                                          ? dateToISO(val, 'YYYY.DD.MM')
+                                          : dayjs(
+                                            dateToISO(val, 'MM-DD-YYYY')
+                                          ).isValid() && isDate(key)
+                                            ? dateToISO(val, 'MM-DD-YYYY')
+                                            : dayjs(
+                                              dateToISO(val, 'DD.MM.YYYY')
+                                            ).isValid() && isDate(key)
+                                              ? dateToISO(val, 'DD.MM.YYYY')
+                                              : val,
               }))
             )
           );
