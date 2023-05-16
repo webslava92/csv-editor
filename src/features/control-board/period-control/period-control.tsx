@@ -34,11 +34,11 @@ export function PeriodControl({
   format,
   setFormat,
   formats,
-  setFormats
+  setFormats,
 }: Props) {
   const handleResetDates = () => {
-    setFromValue(dayjs());
-    setToValue(dayjs());
+    setFromValue(dayjs(`${`${dayjs().format('YYYY-MM-DD')}T`}00:00:00`));
+    setToValue(dayjs(`${`${dayjs().format('YYYY-MM-DD')}T`}23:59:59`));
   };
 
   function randomDate(start: any, end: any) {
@@ -60,30 +60,54 @@ export function PeriodControl({
 
     const isYesterday = endOfRange < startOfRange;
 
-    // Calculate the difference in seconds between the start of the range and the end of the range
     const diffSecondsInRange = isYesterday
       ? startOfRange.diff(endOfRange, 'second')
       : endOfRange.diff(startOfRange, 'second');
 
-    // Calculate a random number of seconds within the range
     const randomSecondsInRange = Math.floor(
       Math.random() * diffSecondsInRange
     );
 
-    // Add the random number of seconds to the start of the range to get the new date and time
     const newRandomDate = startOfRange
-      .add(randomSecondsInRange, 'second')
-      .toISOString();
+      .add(randomSecondsInRange, 'second');
 
     return newRandomDate;
   }
 
-  function randomDepositDate(regDate: any) {
-    const randomMilliseconds =
-      Math.floor(Math.random() * 86400000) + 86400000;
-    return dayjs(regDate)
-      .add(randomMilliseconds, 'millisecond')
-      .toISOString();
+  const isRandom = (val: string) =>
+    !dayjs(val).isBetween(fromValue, toValue);
+
+  function randomDepositDate(random: any, val: any, start: any, end: any) {
+    const randomSeconds = Math.floor(Math.random() * (259200 - 86400) - 86400);
+    const newDate = isRandom(val)
+      ? random.add(2, 'day').add(randomSeconds, 'second')
+      : val.add(2, 'day').add(randomSeconds, 'second');
+
+    const startOfRange = newDate
+      .set('hour', start.hour())
+      .set('minute', start.minute())
+      .set('second', start.second());
+    const endOfRange = newDate
+      .set('hour', end.hour())
+      .set('minute', end.minute())
+      .set('second', end.second());
+
+    const isYesterday = endOfRange < startOfRange;
+
+    const diffSecondsInRange = isYesterday
+      ? startOfRange.diff(endOfRange, 'second')
+      : endOfRange.diff(startOfRange, 'second');
+
+    const randomSecondsInRange = Math.floor(
+      Math.random() * diffSecondsInRange
+    );
+
+    const newDepositDate = startOfRange.add(
+      randomSecondsInRange,
+      'second'
+    );
+
+    return newDepositDate;
   }
 
   const handleChangeDates = () => {
@@ -97,11 +121,11 @@ export function PeriodControl({
             key !== 'phone' &&
             key !== 'id' &&
             key !== 'isUTF'
-              ? dayjs(val).isBetween(fromValue, toValue)
-                ? val
-                : key === 'deposit_date'
-                  ? randomDepositDate(random)
-                  : random
+              ? key === 'deposit_date'
+                ? randomDepositDate(random, item.registration_date, fromValue, toValue)
+                : isRandom(val)
+                  ? random
+                  : val
               : val,
         }))
       );

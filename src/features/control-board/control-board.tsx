@@ -55,8 +55,10 @@ export function ControlBoard({
 }: any) {
   const [defaultData, setDefaultData] = useState<any>([]);
   const [fileName, setFileName] = useState<string>('');
-  const [fromValue, setFromValue] = useState<Dayjs | null>(dayjs());
-  const [toValue, setToValue] = useState<Dayjs | null>(dayjs());
+  const [fromValue, setFromValue] = useState<Dayjs | null>(dayjs(`${`${dayjs().format('YYYY-MM-DD')}T`}00:00:00`));
+  const [toValue, setToValue] = useState<Dayjs | null>(
+    dayjs(`${`${dayjs().format('YYYY-MM-DD')}T`}23:59:59`)
+  );
   const [error, setError] = useState<string>('');
   const [value, setValue] = useState(0);
   const [delimiter, setDelimiter] = useState<string>(',');
@@ -72,7 +74,12 @@ export function ControlBoard({
   useEffect(() => {
     if (dayjs(toValue) >= dayjs(fromValue)) {
       setError('');
-    } else setError('The value cannot be less than the value "from"');
+    } else {
+      setError(
+        // eslint-disable-next-line max-len
+        'Attention! The value of "to" is less than "from".'
+      );
+    }
   }, [fromValue, toValue]);
 
   const styles = {

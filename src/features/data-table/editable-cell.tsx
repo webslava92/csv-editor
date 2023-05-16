@@ -33,6 +33,14 @@ export function EditableCell({
 
   const isEditable = selected.find((select: any) => select === rowId);
 
+  const dateTextWiev =
+    dayjs(value as string).isValid() &&
+    columnId !== 'phone' &&
+    columnId !== 'id' &&
+    columnId !== 'isUTF'
+      ? dayjs(value as string).format(format)
+      : value;
+
   if (isEdit && (isEditable || isEditable === 0)) {
     if (
       dayjs(value as string).isValid() &&
@@ -42,32 +50,30 @@ export function EditableCell({
     ) {
       return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box>
-            <DateTimePicker
-              label='Registration date'
-              format={format}
-              value={dayjs(value) || dayjs()}
-              onChange={(val) => handleDateChange(val)}
-              slotProps={{
-                textField: {
-                  InputProps: {
-                    endAdornment: (
-                      <InputAdornment position='end'>
-                        <CalendarMonth />
-                      </InputAdornment>
-                    ),
-                  },
-                  size: 'small',
+          <DateTimePicker
+            label='Change date'
+            format={format}
+            value={dayjs(value) || dayjs()}
+            onChange={(val) => handleDateChange(val)}
+            slotProps={{
+              textField: {
+                InputProps: {
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <CalendarMonth />
+                    </InputAdornment>
+                  ),
                 },
-              }}
-            />
-          </Box>
+                size: 'small',
+              },
+            }}
+          />
         </LocalizationProvider>
       );
     } if (columnId === 'id') {
-      return <Box component='div'>{value}</Box>;
+      return <Box>{value}</Box>;
     } if (columnId === 'isUTF') {
-      return null;
+      return <Box>{''}</Box>;
     } return (
       <TextField
         value={value}
@@ -85,14 +91,8 @@ export function EditableCell({
       />
     );
   } return (
-    <Box component='div'>
-      {dayjs(value as string).isValid() &&
-      columnId !== 'phone' &&
-      columnId !== 'id' &&
-      columnId !== 'isUTF'
-        ? dayjs(value as string)
-          .format(format)
-        : value}
+    <Box>
+      {dateTextWiev}
     </Box>
   );
 }

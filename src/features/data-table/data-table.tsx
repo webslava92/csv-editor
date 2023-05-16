@@ -58,25 +58,6 @@ export function DataTable({
   const [filteredData, setFilteredData] = useState<any>([]);
   const theme = useTheme();
 
-  // useEffect(() => {
-  //   const data = rows.map((item: any) =>
-  //     Object.assign(
-  //       {},
-  //       ...Object.entries(item).map(([key, val]: any) => ({
-  //         [key]:
-  //           key !== 'phone' &&
-  //           key !== 'id' &&
-  //           key !== 'isUTF' &&
-  //           dayjs(val).isValid()
-  //             ? dayjs(val).toISOString()
-  //             : val,
-  //       }))
-  //     )
-  //   );
-  //   setData(data);
-  //   setFilteredData(data);
-  // }, [format]);
-
   useEffect(() => {
     setFilteredData(rows);
   }, [rows]);
@@ -141,7 +122,7 @@ export function DataTable({
       );
       setVisibleRows(updatedRows);
     },
-    [rows, order, orderBy, page, rowsPerPage]
+    [filteredData, order, orderBy, page, rowsPerPage]
   );
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
@@ -282,11 +263,11 @@ export function DataTable({
                       key={row.id}
                       selected={isItemSelected}
                       sx={{
-                        '&:hover': {
-                          backgroundColor: row.isUTF
-                            ? `${yellow[100]} !important`
-                            : 'unset',
-                        },
+                        // '&:hover': {
+                        //   backgroundColor: row.isUTF
+                        //     ? `${yellow[100]} !important`
+                        //     : 'unset',
+                        // },
                         '& .MuiCheckbox-root': {
                           pointerEvents: 'auto',
                         },
