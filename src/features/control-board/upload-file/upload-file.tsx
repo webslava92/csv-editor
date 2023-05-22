@@ -158,7 +158,9 @@ export function UploadFile({
       {},
       ...Object.entries(item).map(([key, val]: any) => ({
         [key]:
-          dayjs(val).isValid() && isDate(key) ? dayjs(val).format(format) : val,
+          dayjs(val).isValid() && isDate(key)
+            ? dayjs(val).format(format)
+            : val,
       }))
     )
   );
@@ -223,23 +225,23 @@ export function UploadFile({
                                       dateToISO(val, 'DD.MM.YYYY HH:mm')
                                     ).isValid() && isDate(key)
                                       ? dateToISO(val, 'DD.MM.YYYY HH:mm')
-                                      : dayjs(
-                                        dateToISO(val, 'YYYY-MM-DD')
-                                      ).isValid() && isDate(key)
+                                      : dayjs(dateToISO(val, 'YYYY-MM-DD')).isValid() &&
+                      isDate(key)
                                         ? dateToISO(val, 'YYYY-MM-DD')
-                                        : dayjs(
-                                          dateToISO(val, 'YYYY.DD.MM')
-                                        ).isValid() && isDate(key)
+                                        : dayjs(dateToISO(val, 'YYYY.DD.MM')).isValid() &&
+                      isDate(key)
                                           ? dateToISO(val, 'YYYY.DD.MM')
-                                          : dayjs(
-                                            dateToISO(val, 'MM-DD-YYYY')
-                                          ).isValid() && isDate(key)
+                                          : dayjs(dateToISO(val, 'MM-DD-YYYY')).isValid() &&
+                      isDate(key)
                                             ? dateToISO(val, 'MM-DD-YYYY')
-                                            : dayjs(
-                                              dateToISO(val, 'DD.MM.YYYY')
-                                            ).isValid() && isDate(key)
+                                            : dayjs(dateToISO(val, 'DD.MM.YYYY')).isValid() &&
+                      isDate(key)
                                               ? dateToISO(val, 'DD.MM.YYYY')
-                                              : val,
+                                              : typeof val === 'string'
+                                                ? val.substring(val.length - 1) === ' '
+                                                  ? val.trim()
+                                                  : val
+                                                : val,
               }))
             )
           );
